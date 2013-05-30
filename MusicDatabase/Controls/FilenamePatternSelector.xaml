@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="MusicDatabase.FilenamePatternSelector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:engine="clr-namespace:MusicDatabase.Engine;assembly=MusicDatabase.Engine"
+             mc:Ignorable="d" 
+             d:DesignWidth="300">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<engine:FilenameGenerator x:Key="filenameMatching" />
+			<Image x:Key="IconPencil16" Source="/MusicDatabase;component/Images/Pencil_16.png" Stretch="None" />
+		</ResourceDictionary>
+	</UserControl.Resources>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+
+		<ComboBox Grid.Column="0" Margin="0 0 2 0" IsEditable="True" Name="comboPatterns" ItemsSource="{Binding Source={StaticResource filenameMatching}, Path=DefaultPatterns}" />
+		<Button Grid.Column="1" Padding="1" Content="{StaticResource IconPencil16}" Click="btnEdit_Click" />
+	</Grid>
+</UserControl>

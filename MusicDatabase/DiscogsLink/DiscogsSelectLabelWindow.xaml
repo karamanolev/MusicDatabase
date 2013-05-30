@@ -1,0 +1,19 @@
+﻿<Window x:Class="MusicDatabase.DiscogsLink.DiscogsSelectLabelWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MusicDatabase"
+        Title="Select Discogs Label" Width="340" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <GroupBox Header="Discogs Label" Margin="6">
+            <ComboBox Margin="2" Name="comboLabel" />
+        </GroupBox>
+        
+        <local:OKCancelBox Grid.Row="1" Margin="6,0,6,6" OKClicked="OKCancelBox_OKClicked" />
+    </Grid>
+</Window>

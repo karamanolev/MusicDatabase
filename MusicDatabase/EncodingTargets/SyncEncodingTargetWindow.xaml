@@ -1,0 +1,52 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.EncodingTargets.SyncEncodingTargetWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MusicDatabase"
+        Title="Synchronize Encoding Targets" Height="400" Width="600"
+        Closing="Window_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <GroupBox Grid.ColumnSpan="2" Header="Encoding Target Scan" Margin="6,6,6,0">
+            <Grid>
+                <ProgressBar Height="20" Margin="0,2,0,0" Maximum="1"  Name="progressScan" />
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Name="textDirectory" Margin="0,2,0,0" />
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Grid.Column="0" Header="Tracks To Encode" Margin="6,0,0,0" Name="groupTracksToEncode" >
+            <ListView Margin="2" Name="listTracksToEncode">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Release" Width="200" DisplayMemberBinding="{Binding Release}" />
+                        <GridViewColumn Header="Title" Width="136" DisplayMemberBinding="{Binding Title}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Grid.Column="1" Header="Files To Delete" Margin="0,0,6,0" Name="groupFilesToDelete">
+            <ListView Margin="2" Name="listFilesToDelete">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Filename" Width="144" DisplayMemberBinding="{Binding}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </GroupBox>
+
+        <Button Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Width="80" Margin="6,4,6,6"
+                        Click="btnSync_Click" IsEnabled="False" Name="btnSync">Sync</Button>
+        <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,90,0" Name="textLameVersion" />
+
+        <local:NetworkEncodingStatusBox Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="6,4,0,6" Width="200" x:Name="networkBox" />
+    </Grid>
+</local:MusicDatabaseWindow>

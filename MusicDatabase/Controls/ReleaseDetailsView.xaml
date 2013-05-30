@@ -1,0 +1,130 @@
+﻿<UserControl x:Class="MusicDatabase.ReleaseDetailsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:MusicDatabase">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <local:ImageBox Height="180" x:Name="image" VerticalAlignment="Top" Margin="0,0,2,0" />
+
+        <local:ReleaseScoreIndicator VerticalAlignment="Top" Margin="0,184,2,1" x:Name="releaseScore" MinWidth="180" />
+
+        <Grid Grid.Column="1" Margin="0,-7,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Margin="1,0" Grid.ColumnSpan="2" FontSize="22" Name="textArtistsTitle">
+            Album Artist - Release Title
+            </TextBlock>
+
+            <TextBlock Margin="2,0" Grid.Column="0" Grid.Row="1">Genre:</TextBlock>
+            <TextBlock Margin="2,0" Grid.Column="1" Grid.Row="1" Name="textGenre" />
+
+            <TextBlock Margin="2,0" Grid.Column="0" Grid.Row="2">Country:</TextBlock>
+            <TextBlock Margin="2,0" Grid.Column="1" Grid.Row="2" Name="textCountry" />
+
+            <TextBlock Margin="2,0" Grid.Column="0" Grid.Row="3">Released:</TextBlock>
+            <TextBlock Margin="2,0" Grid.Column="1" Grid.Row="3" Name="textReleaseDate" />
+
+            <TextBlock Margin="2,0" Grid.Column="0" Grid.Row="4">Label:</TextBlock>
+            <TextBlock Margin="2,0" Grid.Column="1" Grid.Row="4" Name="textLabel" />
+
+            <TextBlock Margin="2,0" Grid.Column="0" Grid.Row="5">Cat No:</TextBlock>
+            <TextBlock Margin="2,0" Grid.Column="1" Grid.Row="5" Name="textCatalogNumber" />
+
+            <TextBlock Margin="2,0" Grid.Column="0" Grid.Row="6" Name="labelDiscogs">Discogs:</TextBlock>
+            <TextBlock Margin="2,0" Grid.Column="1" Grid.Row="6" Name="textDiscogs">
+                <Hyperlink Name="linkDiscogs" RequestNavigate="link_RequestNavigate">
+                    <TextBlock Name="textDiscogsHyperlink" />
+                </Hyperlink>
+            </TextBlock>
+
+            <TextBlock Margin="2,0" Grid.Column="0" Grid.Row="7" Name="labelDiscogsMaster">D. Master:</TextBlock>
+            <TextBlock Margin="2,0" Grid.Column="1" Grid.Row="7" Name="textDiscogsMaster">
+                <Hyperlink Name="linkDiscogsMaster" RequestNavigate="link_RequestNavigate">
+                    <TextBlock Name="textDiscogsMasterHyperlink" />
+                </Hyperlink>
+            </TextBlock>
+
+            <TextBlock Margin="2,0" Grid.Column="0" Grid.Row="8" Name="labelWiki">Wikipedia:</TextBlock>
+            <TextBlock Margin="2,0" Grid.Column="1" Grid.Row="8" Name="textWiki">
+                <Hyperlink Name="linkWiki" RequestNavigate="link_RequestNavigate">
+                    <TextBlock Name="textWikiHyperlink" />
+                </Hyperlink>
+            </TextBlock>
+
+            <TextBlock Margin="2,0" Grid.Column="0" Grid.Row="9" Name="labelTorrent">Torrent:</TextBlock>
+            <local:FileBox Margin="2,0" Grid.Column="1" Grid.Row="9" x:Name="torrentBox" />
+
+            <TextBlock Margin="2,0" Grid.Column="0" Grid.Row="10" Name="labelFlagMessage" Foreground="Red">Flag:</TextBlock>
+            <TextBlock Margin="2,0" Grid.Column="1" Grid.Row="10" x:Name="textFlagMessage" />
+        </Grid>
+
+        <StackPanel Grid.Column="2">
+            <local:IconButton Icon="{local:Icon Image_16}" Text="Images"  Margin="2,0,0,2"
+                    Click="btnViewImages_Click" x:Name="btnViewImages" HorizontalContentAlignment="Left" />
+            <local:IconButton Icon="{local:Icon PageAttach_16}" Text="Files" Margin="2,0,0,2"
+                    Click="btnViewFiles_Click" x:Name="btnViewFiles" HorizontalContentAlignment="Left" />
+            <local:IconButton Icon="{local:Icon ControlPlayBlue_16}" Text="Play" Margin="2,0,0,2"
+                    Click="btnPlay_Click" x:Name="btnPlay" HorizontalContentAlignment="Left" />
+            <local:IconButton Icon="{local:Icon FlagRed_16}" Text="Flag" Margin="2,0,0,2"
+                    Click="btnFlagToggle_Click" x:Name="btnFlagToggleSmall" HorizontalContentAlignment="Left" />
+            <local:IconButton Icon="{local:Icon Pencil_16}" Text="Edit" Margin="2,0,0,2" Click="btnEdit_Click" />
+
+            <local:ToggleButton Grid.Row="0" Margin="2,0,0,2" HorizontalContentAlignment="Left"
+                                x:Name="btnToggleButtons" CheckedChanged="toggleButtons_CheckedChanged">
+                <local:ToggleButton.Content>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ContentControl Content="{local:Icon BulletBack_16}" />
+                        <TextBlock Grid.Column="1">More</TextBlock>
+                    </Grid>
+                </local:ToggleButton.Content>
+            </local:ToggleButton>
+
+            <Popup PlacementTarget="{Binding ElementName=btnToggleButtons}" Placement="Bottom" Name="popup"
+                   PopupAnimation="Fade" StaysOpen="False" AllowsTransparency="True" Closed="popup_Closed"
+                   VerticalOffset="1" HorizontalOffset="-7">
+                <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="2" Background="White">
+                    <StackPanel Margin="2,2,2,0">
+                        <local:IconButton Icon="{local:Icon Folder_16}" Text="Explore" Margin="0,0,0,2"
+                                          Click="btnExplore_Click" />
+                        <local:IconButton Icon="{local:Icon Memory_16}" Text="CRC" Margin="0,0,0,2"
+                                          Click="btnChecksum_Click" />
+                        <local:IconButton Icon="{local:Icon FlagGreen_16}" Text="Flag" Margin="0,0,0,2"
+                                          Click="btnFlagToggle_Click" x:Name="btnFlagToggle" />
+                        <local:IconButton Icon="{local:Icon Cross_16}" Text="Delete Files" Margin="0,0,0,2"
+                                          Click="btnDelete_Click" />
+                        <local:IconButton Icon="{local:Icon Cross_16}" Text="Remove" Margin="0,0,0,2"
+                                          Click="btnRemove_Click" />
+                    </StackPanel>
+                </Border>
+            </Popup>
+        </StackPanel>
+    </Grid>
+</UserControl>

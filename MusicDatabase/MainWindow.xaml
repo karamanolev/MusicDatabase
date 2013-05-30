@@ -1,0 +1,80 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MusicDatabase"
+        Title="Music Database" Height="800" Width="1200" Closed="Window_Closed"
+        AllowDrop="True" DragEnter="MusicDatabaseWindow_DragEnter" Drop="MusicDatabaseWindow_Drop"
+        Loaded="MusicDatabaseWindow_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Menu>
+            <MenuItem Header="_File">
+                <MenuItem Header="New" Icon="{local:Icon PageWhiteAdd_16}" Click="menuNew_Click" />
+                <MenuItem Header="Open Local" Icon="{local:Icon FolderPage_16}" Click="menuOpen_Click" />
+                <MenuItem Header="Open MySQL" Icon="{local:Icon ServerDatabase_16}" Click="menuOpenMySQL_Click" />
+                <MenuItem Header="Close" Icon="{local:Icon PageWhiteDelete_16}" Click="menuClose_Click" IsEnabled="{Binding HasCollection}" />
+                <MenuItem Header="Backup" IsEnabled="{Binding HasCollection}">
+                    <MenuItem Header="Import Backup" Click="menuImportXml_Click" />
+                    <MenuItem Header="Export Backup" Click="menuExportXml_Click" />
+                    <Separator />
+                    <MenuItem Header="Import Archived Backup" Click="menuImportArchivedXml_Click" />
+                    <MenuItem Header="Export Archived Backup" Click="menuExportArchivedXml_Click" />
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Exit" Icon="{local:Icon DoorOpen_16}" Click="menuExit_Click" />
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="Release Browser" Name="menuViewReleaseBrowser">
+                    <MenuItem Header="Show Images" IsCheckable="True" Name="menuBrowserShowImages" Click="menuBrowserShowImages_Click" />
+                    <Separator />
+                    <MenuItem Header="Tree, Alphabetical"  Tag="AlphabeticalTree" Click="menuBrowserViewMode_Click" />
+                    <MenuItem Header="Tree, Release Date" Tag="ChronologicalTree" Click="menuBrowserViewMode_Click" />
+                    <MenuItem Header="List, Alphabetical" Tag="AlphabeticalList" Click="menuBrowserViewMode_Click" />
+                    <MenuItem Header="List, Release Date" Tag="ChronologicalList" Click="menuBrowserViewMode_Click" />
+                    <MenuItem Header="List, Date Modified" Tag="DateModifiedList" Click="menuBrowserViewMode_Click" />
+                    <MenuItem Header="List, Date Added" Tag="DateAddedList" Click="menuBrowserViewMode_Click" />
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Header="Import Tracks" Icon="{local:Icon Add_16}"
+                          Click="menuImportTracks_Click" IsEnabled="{Binding HasCollection}" />
+                <MenuItem Header="Scan Collection Folder" Icon="{local:Icon ArrowRefresh_16}"
+                          Click="menuScanCollectionFolder_Click" IsEnabled="{Binding HasCollection}" />
+                <MenuItem Header="Sync Encoding Targets" Icon="{local:Icon UsbFlashDriveArrow_16}" IsEnabled="{Binding HasCollection}" Name="menuItemSyncEncodingTargets" />
+                <Separator />
+                <MenuItem Header="Collection Settings" Icon="{local:Icon Cog_16}"
+                          Click="menuCollectionSettings_Click" IsEnabled="{Binding HasCollection}"  />
+                <MenuItem Header="Statistics" Icon="{local:Icon Sum_16}"
+                          Click="menuStatistics_Click" IsEnabled="{Binding HasCollection}" />
+                
+                <MenuItem Header="Advanced">
+                    <MenuItem Header="Clear Window Settings" Click="menuClearWindowSettings_Click" />
+                    <MenuItem Header="Audio Checksum" Click="menuAudioChecksum_Click" />
+                    <MenuItem Header="Server Discovery" Click="menuServerDiscovery_Click" />
+                    <MenuItem Header="Replace Release Files" Click="btnReplaceReleaseFiles_Click" />
+                    <MenuItem Header="Fix Missing DB Fields" Click="btnFixMissingFields_Click" />
+                    <MenuItem Header="Fill Discogs Masters from Release IDs" Click="btnFillDiscogsMasterIds_Click" />
+                    <MenuItem Header="Crash!" Click="btnCrash_Click" />
+                    <MenuItem Header="Update All Releases Dynamic Properties" Click="btnUpdateReleasesDynamicProperties_Click" />
+                    <MenuItem Header="Update All Releases Thumbnails" Click="btnUpdateReleasesThumbnails_Click" />
+                    <MenuItem Header="Test Import Export Releases" Click="btnTestImportExportReleases_Click" />
+                    <MenuItem Header="Audio Format Analysis" Click="btnAudioFormatAnalysis_Click" />
+                    <MenuItem Header="Recalculate ReplayGain" Click="btnRecalculateReplayGain_Click" />
+                    <MenuItem Header="Recalculate DynamicRange" Click="btnRecalculateDynamicRange_Click" />
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        
+        <local:MainCollectionView Grid.Row="1" x:Name="mainCollectionView" Margin="4,2,4,4" />
+
+        <StatusBar Grid.Row="2">
+            <StatusBarItem DockPanel.Dock="Right" Name="statusBarDatabaseInfo" />
+            <StatusBarItem Name="statusBarDatabase">Release</StatusBarItem>
+        </StatusBar>
+    </Grid>
+</local:MusicDatabaseWindow>

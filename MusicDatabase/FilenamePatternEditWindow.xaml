@@ -1,0 +1,67 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.FilenamePatternEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:engine="clr-namespace:MusicDatabase.Engine;assembly=MusicDatabase.Engine"
+        xmlns:local="clr-namespace:MusicDatabase"
+        Title="Edit File Naming Pattern"
+        Height="360" Width="460">
+    <Grid Name="LayoutRoot">
+        <Grid.Resources>
+            <engine:FilenameGenerator x:Key="filenameMatching" />
+        </Grid.Resources>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" Margin="8 8 8 4" Header="Predefined Patterns" >
+            <ListView Margin="2"
+                      ItemsSource="{Binding Source={StaticResource filenameMatching}, Path=DefaultPatterns}"
+                      SelectedValue="{Binding ElementName=textPattern, Path=Text, Mode=TwoWay}" />
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Margin="8 0 8 4" Header="Pattern}">
+            <TextBox Margin="2" Name="textPattern"></TextBox>
+        </GroupBox>
+
+        <GroupBox Grid.Row="2" Margin="8 0 8 4" Header="Selectors">
+            <Grid Margin="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Row="0" Grid.Column="0" Margin="2" Click="btnSelector_Click" Tag="{x:Static engine:FilenameGenerator.ArtistPattern}"       Content="{x:Static engine:FilenameGenerator.ArtistPattern}" />
+                <Button Grid.Row="0" Grid.Column="1" Margin="2" Click="btnSelector_Click" Tag="{x:Static engine:FilenameGenerator.AlbumArtistPattern}"  Content="{x:Static engine:FilenameGenerator.AlbumArtistPattern}" />
+                <Button Grid.Row="0" Grid.Column="2" Margin="2" Click="btnSelector_Click" Tag="{x:Static engine:FilenameGenerator.AlbumPattern}"        Content="{x:Static engine:FilenameGenerator.AlbumPattern}" />
+                <Button Grid.Row="0" Grid.Column="3" Margin="2" Click="btnSelector_Click" Tag="{x:Static engine:FilenameGenerator.TitlePattern}"        Content="{x:Static engine:FilenameGenerator.TitlePattern}" />
+
+                <Button Grid.Row="1" Grid.Column="0" Margin="2" Click="btnSelector_Click" Tag="{x:Static engine:FilenameGenerator.TrackPattern}"        Content="{x:Static engine:FilenameGenerator.TrackPattern}" />
+                <Button Grid.Row="1" Grid.Column="1" Margin="2" Click="btnSelector_Click" Tag="{x:Static engine:FilenameGenerator.DiscPattern}"         Content="{x:Static engine:FilenameGenerator.DiscPattern}" />
+                <Button Grid.Row="1" Grid.Column="2" Margin="2" Click="btnSelector_Click" Tag="{x:Static engine:FilenameGenerator.IfDiscsStartPattern}" Content="{x:Static engine:FilenameGenerator.IfDiscsStartPattern}" />
+                <Button Grid.Row="1" Grid.Column="3" Margin="2" Click="btnSelector_Click" Tag="{x:Static engine:FilenameGenerator.IfDiscsEndPattern}"  Content="{x:Static engine:FilenameGenerator.IfDiscsEndPattern}" />
+
+                <Button Grid.Row="2" Grid.Column="0" Margin="2 4 2 2" Click="btnSelector_Click" Tag="\">\</Button>
+                <Button Grid.Row="2" Grid.Column="1" Margin="2 4 2 2" Click="btnSelector_Click" Tag="{x:Static engine:FilenameGenerator.NumberPattern}">
+                    <TextBlock FontStyle="Italic" Text="{x:Static engine:FilenameGenerator.NumberPattern}" />
+                </Button>
+                <Button Grid.Row="2" Grid.Column="2" Margin="2 4 2 2" Click="btnSelector_Click" Tag="{x:Static engine:FilenameGenerator.TextPattern}">
+                    <TextBlock FontStyle="Italic" Text="{x:Static engine:FilenameGenerator.TextPattern}" />
+                </Button>
+            </Grid>
+        </GroupBox>
+
+        <local:OKCancelBox Grid.Row="3" Margin="8 0 8 8" OKClicked="OKCancelBox_OKClicked" />
+    </Grid>
+</local:MusicDatabaseWindow>

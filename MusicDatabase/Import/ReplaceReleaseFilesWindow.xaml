@@ -1,0 +1,38 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.Import.ReplaceReleaseFilesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MusicDatabase"
+        Title="ReplaceReleaseFilesWindow" Height="450" Width="680">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ListView Grid.Column="0" Margin="6,6,3,4" Name="listTracks">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Disc" Width="40" DisplayMemberBinding="{Binding Disc}" />
+                    <GridViewColumn Header="Pos" Width="40" DisplayMemberBinding="{Binding Position}" />
+                    <GridViewColumn Header="Title" Width="210" DisplayMemberBinding="{Binding Title}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        
+        <ListView Grid.Column="1" Margin="3,6,6,4" AllowDrop="True" DragEnter="ListView_DragEnter" Drop="ListView_Drop" Name="listImportItems">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Filename" Width="140" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Title" Width="150" DisplayMemberBinding="{Binding Tag.Title}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <local:OKCancelBox Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,6,6" OKClicked="OKCancelBox_OKClicked" x:Name="okCancelBox" IsOKEnabled="False" />
+        <local:NetworkEncodingStatusBox Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="6,0,0,6" Width="200" x:Name="networkBox" />
+    </Grid>
+</local:MusicDatabaseWindow>

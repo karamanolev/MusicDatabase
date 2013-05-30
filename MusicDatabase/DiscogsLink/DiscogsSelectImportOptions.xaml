@@ -1,0 +1,32 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.DiscogsLink.DiscogsSelectImportOptions"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MusicDatabase"
+        Title="Select Import Options" Height="240" Width="300">
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <CheckBox Grid.Row="0" Name="checkImportTitle" Margin="2" IsChecked="True">Import Title</CheckBox>
+        <CheckBox Grid.Row="1" Name="checkImportTrackData" Margin="2" IsChecked="True">Import Track Names And Artists</CheckBox>
+        <CheckBox Grid.Row="2" Name="checkImportAlbumArtist" Margin="2" IsChecked="True">Import Album Artist</CheckBox>
+        <CheckBox Grid.Row="3" Name="checkImportReleaseDate" Margin="2" IsChecked="True">Import Release Date</CheckBox>
+        <CheckBox Grid.Row="4" Name="checkImportImages" Margin="2" IsChecked="True">Import Images</CheckBox>
+        <CheckBox Grid.Row="5" Name="checkImportCatalogInformation" Margin="2" IsChecked="True">Import Catalog Information</CheckBox>
+        <CheckBox Grid.Row="6" Name="checkImportNotes" Margin="2" IsChecked="True">Import Notes</CheckBox>
+        <CheckBox Grid.Row="7" Name="checkFixNames" Margin="2" IsChecked="True">
+            <Run FontWeight="Bold">Fix Names</Run>
+        </CheckBox>
+
+        <local:OKCancelBox Grid.Row="8" VerticalAlignment="Bottom" OKClicked="OKCancelBox_OKClicked" />
+    </Grid>
+</local:MusicDatabaseWindow>

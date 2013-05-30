@@ -1,0 +1,38 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.DiscogsLink.DiscogsSelectReleaseWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:discogs="clr-namespace:MusicDatabase.DiscogsLink"
+        xmlns:local="clr-namespace:MusicDatabase"
+        Title="Select Release"
+        Height="600" Width="800">
+    <Grid Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <GroupBox Margin="8 8 8 4" Header="Find Release">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Release URL or ID:" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" Name="textReleaseId" Margin="4 2 2 2" />
+                <Button Grid.Column="2" Width="80" Margin="2" Name="btnGo" Click="btnGo_Click" IsDefault="True" Content="Go" />
+            </Grid>
+        </GroupBox>
+        
+        <Border Grid.Row="1" BorderBrush="DarkGray" BorderThickness="1" CornerRadius="4" Padding="4" Margin="8 0 8 4">
+            <Grid>
+                <TextBlock Name="textStatus" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Initializing" />
+                <discogs:ReleaseViewer x:Name="releaseViewer" />
+            </Grid>
+        </Border>
+
+        <local:OKCancelBox Grid.Row="2" Margin="8 0 8 8" OKClicked="OKCancelBox_OKClicked" />
+    </Grid>
+</local:MusicDatabaseWindow>

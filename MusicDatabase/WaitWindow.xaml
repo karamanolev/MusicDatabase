@@ -1,0 +1,14 @@
+﻿<Window x:Class="MusicDatabase.WaitWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Processing" Width="300" Closing="Window_Closing"
+        WindowStartupLocation="CenterOwner" SizeToContent="Height">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Margin="8,8,8,0" FontSize="16" Name="labelMessage">Downloading images. Please wait.</TextBlock>
+        <ProgressBar Grid.Row="1" Height="20" Margin="8" Maximum="1" Name="progressBar" />
+    </Grid>
+</Window>

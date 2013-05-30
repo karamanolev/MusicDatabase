@@ -1,0 +1,20 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.Advanced.TestImportExportReleases"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MusicDatabase"
+        Title="TestImportExportReleases" Height="500" Width="750">
+    <Grid>
+        <GroupBox Header="Release export-import comparison" Margin="6">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="AUTO" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
+                <ProgressBar Height="20" Margin="6" Name="progressBar" Maximum="1" />
+                
+                <TextBox Grid.Row="1" IsReadOnly="True" TextWrapping="Wrap" Name="textDifferences" Margin="6,0,6,6" VerticalScrollBarVisibility="Auto" />
+            </Grid>
+        </GroupBox>
+    </Grid>
+</local:MusicDatabaseWindow>

@@ -1,0 +1,62 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.DiscogsLink.DiscogsMatchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MusicDatabase"
+        Title="Discgs Match Window" Height="600" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="Select Tracks To Match" Margin="8 8 8 4">
+            <ListView Margin="2" Name="listReleaseTracklist" SelectionChanged="listReleaseTracklist_SelectionChanged">
+                <ListView.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Aggregate.HasTrackArtists}" Value="True">
+                                <Setter Property="ListView.View">
+                                    <Setter.Value>
+                                        <GridView>
+                                            <GridViewColumn Header="Position" Width="80" DisplayMemberBinding="{Binding Position}" />
+                                            <GridViewColumn Header="Artist" Width="245" DisplayMemberBinding="{Binding JoinedArtistsFixed}" />
+                                            <GridViewColumn Header="Title" Width="245" DisplayMemberBinding="{Binding Title}" />
+                                        </GridView>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Aggregate.HasTrackArtists}" Value="False">
+                                <Setter Property="ListView.View">
+                                    <Setter.Value>
+                                        <GridView>
+                                            <GridViewColumn Header="Position" Width="80" DisplayMemberBinding="{Binding Position}" />
+                                            <GridViewColumn Header="Title" Width="490" DisplayMemberBinding="{Binding Title}" />
+                                        </GridView>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.Style>
+            </ListView>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Header="Matching" Margin="8 0 8 4">
+            <ListView Name="listMatching">
+                <ListView.View>
+                    <GridView>
+                        <GridView.Columns>
+                            <GridViewColumn Header="Filename" Width="250" DisplayMemberBinding="{Binding Filename}" />
+                            <GridViewColumn Header="Track" Width="60" DisplayMemberBinding="{Binding TrackDisplay}" />
+                            <GridViewColumn Header="Artist" Width="200" DisplayMemberBinding="{Binding Artist}" />
+                            <GridViewColumn Header="Title" Width="200" DisplayMemberBinding="{Binding Title}" />
+                        </GridView.Columns>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </GroupBox>
+
+        <local:OKCancelBox OKClicked="OKCancelBox_OKClicked" Grid.Row="2" Margin="8 0 8 8" />
+    </Grid>
+</local:MusicDatabaseWindow>

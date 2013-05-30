@@ -1,0 +1,33 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.Advanced.AudioChecksumWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:MusicDatabase"
+             mc:Ignorable="d"
+             Height="450" Width="700" WindowStartupLocation="CenterOwner" Title="Audio Checksum"
+             AllowDrop="True" DragEnter="Window_DragEnter" Drop="Window_Drop" Closing="Window_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="Checksum Computation Progress" Margin="6">
+            <Grid>
+                <ProgressBar Margin="2" Maximum="1" Name="progressChecksum" Height="20" />
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Name="textStatus" />
+            </Grid>
+        </GroupBox>
+
+        <ListView Grid.Row="1" Margin="6,0,6,6" Name="listChecksums">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Path" Width="240" DisplayMemberBinding="{Binding Path}" />
+                    <GridViewColumn Header="File" Width="240" DisplayMemberBinding="{Binding Filename}" />
+                    <GridViewColumn Header="CRC32 Checksum" Width="102" DisplayMemberBinding="{Binding Checksum}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</local:MusicDatabaseWindow>

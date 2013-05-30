@@ -1,0 +1,1277 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3AD3F051-AE9F-4436-B428-95E10201CC1E}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MusicDatabase</RootNamespace>
+    <AssemblyName>MusicDatabase</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>MusicDatabase.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CUETools.Codecs">
+      <HintPath>..\Libraries\CUETools.Codecs.dll</HintPath>
+    </Reference>
+    <Reference Include="CUETools.Codecs.APE, Version=1.0.4182.197, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\CUETools.Codecs.APE.dll</HintPath>
+    </Reference>
+    <Reference Include="CUETools.Codecs.WavPack, Version=1.2.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\CUETools.Codecs.WavPack.dll</HintPath>
+    </Reference>
+    <Reference Include="FluentNHibernate, Version=1.3.0.733, Culture=neutral, PublicKeyToken=8aa435e3cb308880, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\FluentNHibernate.1.3.0.733\lib\FluentNHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\Libraries\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Iesi.Collections, Version=1.0.1.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.3.3.1.4000\lib\Net35\Iesi.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\IronPython.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Dynamic, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\Microsoft.Dynamic.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Scripting, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\Microsoft.Scripting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mindscape.WpfElements">
+      <HintPath>..\Libraries\Mindscape.WpfElements.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoTorrent">
+      <HintPath>..\Libraries\MonoTorrent.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\packages\MySql.Data.6.5.4\lib\net40\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=3.3.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NHibernate.3.3.1.4000\lib\Net35\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.82.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\System.Data.SQLite.1.0.82.0\lib\net40\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\packages\System.Data.SQLite.1.0.82.0\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Controls.DataVisualization.Toolkit">
+      <HintPath>..\Libraries\System.Windows.Controls.DataVisualization.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="taglib-sharp">
+      <HintPath>..\Libraries\taglib-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Controls">
+      <HintPath>..\Libraries\Telerik.Windows.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Controls.GridView, Version=2011.3.1130.35, Culture=neutral, PublicKeyToken=d3625f8bf04286d7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\Telerik.Windows.Controls.GridView.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Controls.Input">
+      <HintPath>..\Libraries\Telerik.Windows.Controls.Input.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Controls.Navigation">
+      <HintPath>..\Libraries\Telerik.Windows.Controls.Navigation.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Data">
+      <HintPath>..\Libraries\Telerik.Windows.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WPFToolkit">
+      <HintPath>..\Libraries\WPFToolkit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Advanced\AudioChecksumWindow.xaml.cs">
+      <DependentUpon>AudioChecksumWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Advanced\AudioFormatAnalysisWindow.xaml.cs">
+      <DependentUpon>AudioFormatAnalysisWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Advanced\FillReleaseDiscogsMasterIdsWindow.xaml.cs">
+      <DependentUpon>FillReleaseDiscogsMasterIdsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Advanced\ServerDiscoveryWindow.xaml.cs">
+      <DependentUpon>ServerDiscoveryWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Advanced\TestImportExportReleasesWindow.xaml.cs">
+      <DependentUpon>TestImportExportReleasesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\CollectionStatisticsControl.xaml.cs">
+      <DependentUpon>CollectionStatisticsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\CheckBox.cs" />
+    <Compile Include="Controls\IReleaseBrowser.cs" />
+    <Compile Include="Controls\MainCollectionViewOperations.cs" />
+    <Compile Include="Controls\ReleaseFilter.cs" />
+    <Compile Include="Controls\ReleaseList.xaml.cs">
+      <DependentUpon>ReleaseList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ScoreIndicator.xaml.cs">
+      <DependentUpon>ScoreIndicator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ReleaseTree.xaml.cs">
+      <DependentUpon>ReleaseTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DiscogsLink\DiscogsReleaseMerger.cs" />
+    <Compile Include="DiscogsLink\DiscogsSelectLabelWindow.xaml.cs">
+      <DependentUpon>DiscogsSelectLabelWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Edit\EditReleaseDiscEditor.xaml.cs">
+      <DependentUpon>EditReleaseDiscEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Edit\EditReleaseWindow.xaml.cs">
+      <DependentUpon>EditReleaseWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EncodingTargets\AddEncodingTargetWindow.xaml.cs">
+      <DependentUpon>AddEncodingTargetWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EncodingTargets\EncodingTargetsSettingsWindow.xaml.cs">
+      <DependentUpon>EncodingTargetsSettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EncodingTargets\SyncEncodingTargetWindow.xaml.cs">
+      <DependentUpon>SyncEncodingTargetWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Controls\FileBox.xaml.cs">
+      <DependentUpon>FileBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs.cs" />
+    <Compile Include="DiscogsLink\DiscogsReleaseIdTextBox.xaml.cs">
+      <DependentUpon>DiscogsReleaseIdTextBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DiscogsLink\DiscogsSelectImportOptions.xaml.cs">
+      <DependentUpon>DiscogsSelectImportOptions.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DiscogsLink\DiscogsUtility.cs" />
+    <Compile Include="FilenamePatternEditWindow.xaml.cs">
+      <DependentUpon>FilenamePatternEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EncodingWindow.xaml.cs">
+      <DependentUpon>EncodingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\FilenamePatternSelector.xaml.cs">
+      <DependentUpon>FilenamePatternSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FlagReleaseWindow.xaml.cs">
+      <DependentUpon>FlagReleaseWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\IconButton.xaml.cs">
+      <DependentUpon>IconButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="IconExtension.cs" />
+    <Compile Include="Controls\AdditionalFileEditor.xaml.cs">
+      <DependentUpon>AdditionalFileEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\AdditionalFilesEditor.xaml.cs">
+      <DependentUpon>AdditionalFilesEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DiscogsLink\DiscogsMatchWindow.xaml.cs">
+      <DependentUpon>DiscogsMatchWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DiscogsLink\DiscogsSelectReleaseWindow.xaml.cs">
+      <DependentUpon>DiscogsSelectReleaseWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DiscogsLink\ReleaseHeaderViewer.xaml.cs">
+      <DependentUpon>ReleaseHeaderViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DiscogsLink\ReleaseViewer.xaml.cs">
+      <DependentUpon>ReleaseViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EditCollectionSettingsWindow.xaml.cs">
+      <DependentUpon>EditCollectionSettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\FolderPickerButton.xaml.cs">
+      <DependentUpon>FolderPickerButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ImageButton.xaml.cs">
+      <DependentUpon>ImageButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ImageStudio\ImageExtensions.cs" />
+    <Compile Include="ImageStudio\ImageStudioImportWindow.xaml.cs">
+      <DependentUpon>ImageStudioImportWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ImageStudio\InputImage.cs" />
+    <Compile Include="ImageStudio\OutputImage.cs" />
+    <Compile Include="ImageStudio\PythonExecutioner.cs" />
+    <Compile Include="Import\CueSourceItem.cs" />
+    <Compile Include="Controls\ImageBox.xaml.cs">
+      <DependentUpon>ImageBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Import\ImportAdditionalFileItem.cs" />
+    <Compile Include="Import\ReplaceReleaseFilesWindow.xaml.cs">
+      <DependentUpon>ReplaceReleaseFilesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Import\TrackAddingEventArgs.cs" />
+    <Compile Include="Import\FileSourceItem.cs" />
+    <Compile Include="Import\ImportReleaseItem.cs" />
+    <Compile Include="Import\IImportSourceItem.cs" />
+    <Compile Include="Import\ImportTrackItem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Import\ImportTracksDiscEditor.xaml.cs">
+      <DependentUpon>ImportTracksDiscEditor.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Import\ImportTracksWindow.xaml.cs">
+      <DependentUpon>ImportTracksWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ReleaseDetailsEditor.xaml.cs">
+      <DependentUpon>ReleaseDetailsEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MainCollectionView.xaml.cs">
+      <DependentUpon>MainCollectionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LibraryLoader.cs" />
+    <Compile Include="MusicDatabaseWindow.cs" />
+    <Compile Include="Controls\NetworkEncodingStatusBox.xaml.cs">
+      <DependentUpon>NetworkEncodingStatusBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MySQLConnectionParamsWindow.xaml.cs">
+      <DependentUpon>MySQLConnectionParamsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OKCancelBox.xaml.cs">
+      <DependentUpon>OKCancelBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProgressBarUpdater.cs" />
+    <Compile Include="Controls\ReleaseDetailsView.xaml.cs">
+      <DependentUpon>ReleaseDetailsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ReleaseImagesEditor.xaml.cs">
+      <DependentUpon>ReleaseImagesEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AudioSourceResolverRegisterer.cs" />
+    <Compile Include="Controls\ReleaseCoverFlow.xaml.cs">
+      <DependentUpon>ReleaseCoverFlow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ScanCollectionFolderWindow.xaml.cs">
+      <DependentUpon>ScanCollectionFolderWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\Entities\MusicDatabaseSettings.cs" />
+    <Compile Include="Settings\Entities\WindowSettings.cs" />
+    <Compile Include="Settings\SettingsManager.cs" />
+    <Compile Include="Settings\SettingsSessionFactory.cs" />
+    <Compile Include="StatisticsWindow.xaml.cs">
+      <DependentUpon>StatisticsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIHelper.cs" />
+    <Compile Include="Controls\TracklistView.xaml.cs">
+      <DependentUpon>TracklistView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ToggleButton.cs" />
+    <Compile Include="Helpers\ReleaseThumbnailConverter.cs" />
+    <Compile Include="VerificationWindow.xaml.cs">
+      <DependentUpon>VerificationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewAdditionalFileWindow.xaml.cs">
+      <DependentUpon>ViewAdditionalFileWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewImageWindow.xaml.cs">
+      <DependentUpon>ViewImageWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewReleaseFilesWindow.xaml.cs">
+      <DependentUpon>ViewReleaseFilesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewReleaseImagesWindow.xaml.cs">
+      <DependentUpon>ViewReleaseImagesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewReleaseWindow.xaml.cs">
+      <DependentUpon>ViewReleaseWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WaitWindow.xaml.cs">
+      <DependentUpon>WaitWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WikipediaLink\WikipediaImporter.cs" />
+    <Compile Include="WikipediaLink\WikipediaImporterWindow.xaml.cs">
+      <DependentUpon>WikipediaImporterWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Advanced\AudioChecksumWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Advanced\AudioFormatAnalysisWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Advanced\FillReleaseDiscogsMasterIdsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Advanced\ServerDiscoveryWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Advanced\TestImportExportReleasesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\CollectionStatisticsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ReleaseList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ScoreIndicator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ReleaseTree.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TileViewCustomStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DiscogsLink\DiscogsSelectLabelWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Edit\EditReleaseDiscEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Edit\EditReleaseWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EncodingTargets\AddEncodingTargetWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EncodingTargets\EncodingTargetsSettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EncodingTargets\SyncEncodingTargetWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\FileBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DiscogsLink\DiscogsReleaseIdTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DiscogsLink\DiscogsSelectImportOptions.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FilenamePatternEditWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="EncodingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\FilenamePatternSelector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\AdditionalFileEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\AdditionalFilesEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DiscogsLink\DiscogsMatchWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DiscogsLink\DiscogsSelectReleaseWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DiscogsLink\ReleaseHeaderViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DiscogsLink\ReleaseViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="EditCollectionSettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FlagReleaseWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\FolderPickerButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ImageBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\IconButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ImageButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ImageStudio\ImageStudioImportWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Import\ImportTracksDiscEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Import\ImportTracksWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ReleaseDetailsEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MainCollectionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Import\ReplaceReleaseFilesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Controls\NetworkEncodingStatusBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MySQLConnectionParamsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="OKCancelBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ReleaseDetailsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ReleaseImagesEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ReleaseCoverFlow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ScanCollectionFolderWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TracklistView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StatisticsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="VerificationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewAdditionalFileWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewImageWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewReleaseFilesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewReleaseImagesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewReleaseWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WaitWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WikipediaLink\WikipediaImporterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DiscogsNet\DiscogsNet\DiscogsNet.csproj">
+      <Project>{1B087A97-C17A-4F75-80B1-8CC1FBFE90FB}</Project>
+      <Name>DiscogsNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NImageMagick\NImageMagick\NImageMagick.csproj">
+      <Project>{c56442fb-a4a4-4ad0-bef2-dea9b1be6404}</Project>
+      <Name>NImageMagick</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NReplayGain\NReplayGain\NReplayGain.csproj">
+      <Project>{db09d113-3656-4099-ae63-41a07e2e61d1}</Project>
+      <Name>NReplayGain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MusicDatabase.Audio.Flac\MusicDatabase.Audio.Flac.csproj">
+      <Project>{C7DFED9C-E36F-47A7-A894-CF4BFB24D864}</Project>
+      <Name>MusicDatabase.Audio.Flac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MusicDatabase.Audio.Mp3\MusicDatabase.Audio.Mp3.csproj">
+      <Project>{BDD9587B-8CB3-4EE1-A2B3-038F1AE22633}</Project>
+      <Name>MusicDatabase.Audio.Mp3</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MusicDatabase.Audio.Network\MusicDatabase.Audio.Network.csproj">
+      <Project>{44B4D277-4E14-413A-BCF4-FD7515FE7640}</Project>
+      <Name>MusicDatabase.Audio.Network</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MusicDatabase.Audio\MusicDatabase.Audio.csproj">
+      <Project>{B2BB2851-28FA-4320-817D-ED77C287F392}</Project>
+      <Name>MusicDatabase.Audio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MusicDatabase.Engine\MusicDatabase.Engine.csproj">
+      <Project>{A305604B-12D3-458D-A34E-09D4B83A70C6}</Project>
+      <Name>MusicDatabase.Engine</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Pencil_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Cross_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Add_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Cog_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Disk_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Image_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PageAttach_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ArrowRefresh_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\FlagGreen_16.png" />
+    <Resource Include="Images\FlagRed_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ControlPlayBlue_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\BulletGo_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ArrowDown_16.png" />
+    <Resource Include="Images\ArrowUp_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\UsbFlashDriveArrow_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Libraries\x86\CORE_RL_bzlib_.dll">
+      <Link>x86\CORE_RL_bzlib_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_coders_.dll">
+      <Link>x86\CORE_RL_coders_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_filters_.dll">
+      <Link>x86\CORE_RL_filters_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_jbig_.dll">
+      <Link>x86\CORE_RL_jbig_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_jp2_.dll">
+      <Link>x86\CORE_RL_jp2_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_jpeg_.dll">
+      <Link>x86\CORE_RL_jpeg_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_lcms_.dll">
+      <Link>x86\CORE_RL_lcms_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_libxml_.dll">
+      <Link>x86\CORE_RL_libxml_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_Magick++_.dll">
+      <Link>x86\CORE_RL_Magick++_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_magick_.dll">
+      <Link>x86\CORE_RL_magick_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_png_.dll">
+      <Link>x86\CORE_RL_png_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_tiff_.dll">
+      <Link>x86\CORE_RL_tiff_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_ttf_.dll">
+      <Link>x86\CORE_RL_ttf_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_wand_.dll">
+      <Link>x86\CORE_RL_wand_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_xlib_.dll">
+      <Link>x86\CORE_RL_xlib_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\CORE_RL_zlib_.dll">
+      <Link>x86\CORE_RL_zlib_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_aai_.dll">
+      <Link>x86\IM_MOD_RL_aai_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_art_.dll">
+      <Link>x86\IM_MOD_RL_art_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_avs_.dll">
+      <Link>x86\IM_MOD_RL_avs_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_bgr_.dll">
+      <Link>x86\IM_MOD_RL_bgr_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_bmp_.dll">
+      <Link>x86\IM_MOD_RL_bmp_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_braille_.dll">
+      <Link>x86\IM_MOD_RL_braille_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_cals_.dll">
+      <Link>x86\IM_MOD_RL_cals_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_caption_.dll">
+      <Link>x86\IM_MOD_RL_caption_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_cin_.dll">
+      <Link>x86\IM_MOD_RL_cin_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_cip_.dll">
+      <Link>x86\IM_MOD_RL_cip_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_clipboard_.dll">
+      <Link>x86\IM_MOD_RL_clipboard_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_clip_.dll">
+      <Link>x86\IM_MOD_RL_clip_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_cmyk_.dll">
+      <Link>x86\IM_MOD_RL_cmyk_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_cut_.dll">
+      <Link>x86\IM_MOD_RL_cut_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_dcm_.dll">
+      <Link>x86\IM_MOD_RL_dcm_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_dds_.dll">
+      <Link>x86\IM_MOD_RL_dds_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_debug_.dll">
+      <Link>x86\IM_MOD_RL_debug_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_dib_.dll">
+      <Link>x86\IM_MOD_RL_dib_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_djvu_.dll">
+      <Link>x86\IM_MOD_RL_djvu_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_dng_.dll">
+      <Link>x86\IM_MOD_RL_dng_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_dot_.dll">
+      <Link>x86\IM_MOD_RL_dot_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_dps_.dll">
+      <Link>x86\IM_MOD_RL_dps_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_dpx_.dll">
+      <Link>x86\IM_MOD_RL_dpx_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_emf_.dll">
+      <Link>x86\IM_MOD_RL_emf_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_ept_.dll">
+      <Link>x86\IM_MOD_RL_ept_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_exr_.dll">
+      <Link>x86\IM_MOD_RL_exr_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_fax_.dll">
+      <Link>x86\IM_MOD_RL_fax_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_fd_.dll">
+      <Link>x86\IM_MOD_RL_fd_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_fits_.dll">
+      <Link>x86\IM_MOD_RL_fits_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_fpx_.dll">
+      <Link>x86\IM_MOD_RL_fpx_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_gif_.dll">
+      <Link>x86\IM_MOD_RL_gif_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_gradient_.dll">
+      <Link>x86\IM_MOD_RL_gradient_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_gray_.dll">
+      <Link>x86\IM_MOD_RL_gray_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_hald_.dll">
+      <Link>x86\IM_MOD_RL_hald_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_hdr_.dll">
+      <Link>x86\IM_MOD_RL_hdr_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_histogram_.dll">
+      <Link>x86\IM_MOD_RL_histogram_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_hrz_.dll">
+      <Link>x86\IM_MOD_RL_hrz_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_html_.dll">
+      <Link>x86\IM_MOD_RL_html_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_icon_.dll">
+      <Link>x86\IM_MOD_RL_icon_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_info_.dll">
+      <Link>x86\IM_MOD_RL_info_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_inline_.dll">
+      <Link>x86\IM_MOD_RL_inline_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_ipl_.dll">
+      <Link>x86\IM_MOD_RL_ipl_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_jbig_.dll">
+      <Link>x86\IM_MOD_RL_jbig_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_jnx_.dll">
+      <Link>x86\IM_MOD_RL_jnx_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_jp2_.dll">
+      <Link>x86\IM_MOD_RL_jp2_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_jpeg_.dll">
+      <Link>x86\IM_MOD_RL_jpeg_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_label_.dll">
+      <Link>x86\IM_MOD_RL_label_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_mac_.dll">
+      <Link>x86\IM_MOD_RL_mac_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_magick_.dll">
+      <Link>x86\IM_MOD_RL_magick_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_map_.dll">
+      <Link>x86\IM_MOD_RL_map_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_matte_.dll">
+      <Link>x86\IM_MOD_RL_matte_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_mat_.dll">
+      <Link>x86\IM_MOD_RL_mat_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_meta_.dll">
+      <Link>x86\IM_MOD_RL_meta_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_miff_.dll">
+      <Link>x86\IM_MOD_RL_miff_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_mono_.dll">
+      <Link>x86\IM_MOD_RL_mono_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_mpc_.dll">
+      <Link>x86\IM_MOD_RL_mpc_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_mpeg_.dll">
+      <Link>x86\IM_MOD_RL_mpeg_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_mpr_.dll">
+      <Link>x86\IM_MOD_RL_mpr_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_msl_.dll">
+      <Link>x86\IM_MOD_RL_msl_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_mtv_.dll">
+      <Link>x86\IM_MOD_RL_mtv_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_mvg_.dll">
+      <Link>x86\IM_MOD_RL_mvg_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_null_.dll">
+      <Link>x86\IM_MOD_RL_null_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_otb_.dll">
+      <Link>x86\IM_MOD_RL_otb_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_palm_.dll">
+      <Link>x86\IM_MOD_RL_palm_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pango_.dll">
+      <Link>x86\IM_MOD_RL_pango_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pattern_.dll">
+      <Link>x86\IM_MOD_RL_pattern_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pcd_.dll">
+      <Link>x86\IM_MOD_RL_pcd_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pcl_.dll">
+      <Link>x86\IM_MOD_RL_pcl_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pcx_.dll">
+      <Link>x86\IM_MOD_RL_pcx_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pdb_.dll">
+      <Link>x86\IM_MOD_RL_pdb_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pdf_.dll">
+      <Link>x86\IM_MOD_RL_pdf_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pes_.dll">
+      <Link>x86\IM_MOD_RL_pes_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pict_.dll">
+      <Link>x86\IM_MOD_RL_pict_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pix_.dll">
+      <Link>x86\IM_MOD_RL_pix_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_plasma_.dll">
+      <Link>x86\IM_MOD_RL_plasma_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_png_.dll">
+      <Link>x86\IM_MOD_RL_png_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pnm_.dll">
+      <Link>x86\IM_MOD_RL_pnm_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_preview_.dll">
+      <Link>x86\IM_MOD_RL_preview_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_ps2_.dll">
+      <Link>x86\IM_MOD_RL_ps2_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_ps3_.dll">
+      <Link>x86\IM_MOD_RL_ps3_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_psd_.dll">
+      <Link>x86\IM_MOD_RL_psd_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_ps_.dll">
+      <Link>x86\IM_MOD_RL_ps_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_pwp_.dll">
+      <Link>x86\IM_MOD_RL_pwp_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_raw_.dll">
+      <Link>x86\IM_MOD_RL_raw_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_rgb_.dll">
+      <Link>x86\IM_MOD_RL_rgb_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_rla_.dll">
+      <Link>x86\IM_MOD_RL_rla_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_rle_.dll">
+      <Link>x86\IM_MOD_RL_rle_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_scr_.dll">
+      <Link>x86\IM_MOD_RL_scr_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_sct_.dll">
+      <Link>x86\IM_MOD_RL_sct_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_sfw_.dll">
+      <Link>x86\IM_MOD_RL_sfw_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_sgi_.dll">
+      <Link>x86\IM_MOD_RL_sgi_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_stegano_.dll">
+      <Link>x86\IM_MOD_RL_stegano_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_sun_.dll">
+      <Link>x86\IM_MOD_RL_sun_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_svg_.dll">
+      <Link>x86\IM_MOD_RL_svg_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_tga_.dll">
+      <Link>x86\IM_MOD_RL_tga_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_thumbnail_.dll">
+      <Link>x86\IM_MOD_RL_thumbnail_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_tiff_.dll">
+      <Link>x86\IM_MOD_RL_tiff_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_tile_.dll">
+      <Link>x86\IM_MOD_RL_tile_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_tim_.dll">
+      <Link>x86\IM_MOD_RL_tim_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_ttf_.dll">
+      <Link>x86\IM_MOD_RL_ttf_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_txt_.dll">
+      <Link>x86\IM_MOD_RL_txt_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_uil_.dll">
+      <Link>x86\IM_MOD_RL_uil_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_url_.dll">
+      <Link>x86\IM_MOD_RL_url_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_uyvy_.dll">
+      <Link>x86\IM_MOD_RL_uyvy_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_vicar_.dll">
+      <Link>x86\IM_MOD_RL_vicar_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_vid_.dll">
+      <Link>x86\IM_MOD_RL_vid_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_viff_.dll">
+      <Link>x86\IM_MOD_RL_viff_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_wbmp_.dll">
+      <Link>x86\IM_MOD_RL_wbmp_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_webp_.dll">
+      <Link>x86\IM_MOD_RL_webp_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_wmf_.dll">
+      <Link>x86\IM_MOD_RL_wmf_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_wpg_.dll">
+      <Link>x86\IM_MOD_RL_wpg_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_xbm_.dll">
+      <Link>x86\IM_MOD_RL_xbm_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_xcf_.dll">
+      <Link>x86\IM_MOD_RL_xcf_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_xc_.dll">
+      <Link>x86\IM_MOD_RL_xc_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_xpm_.dll">
+      <Link>x86\IM_MOD_RL_xpm_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_xps_.dll">
+      <Link>x86\IM_MOD_RL_xps_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_xwd_.dll">
+      <Link>x86\IM_MOD_RL_xwd_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_x_.dll">
+      <Link>x86\IM_MOD_RL_x_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_ycbcr_.dll">
+      <Link>x86\IM_MOD_RL_ycbcr_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\IM_MOD_RL_yuv_.dll">
+      <Link>x86\IM_MOD_RL_yuv_.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\libFLAC.dll">
+      <Link>x86\libFLAC.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\libmp3lame.dll">
+      <Link>x86\libmp3lame.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Libraries\x86\X11.dll">
+      <Link>x86\X11.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="x86\SQLite.Interop.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Images\ServerDatabase_16.png" />
+    <Resource Include="MusicDatabase.ico" />
+    <Resource Include="Images\Disk_20.png" />
+    <Resource Include="Images\Disk_Glow_20.png" />
+    <Resource Include="Images\Cross_Glow_16.png" />
+    <Resource Include="Images\Jewelcase.png" />
+    <Resource Include="Images\JewelcaseNoImage.png" />
+    <Resource Include="Images\PageCode_16.png" />
+    <Resource Include="Images\Sum_16.png" />
+    <Resource Include="Images\Folder_16.png" />
+    <Resource Include="Images\Memory_16.png" />
+    <Resource Include="Images\BulletBack_16.png" />
+    <Resource Include="Images\DoorOpen_16.png" />
+    <Resource Include="Images\PageWhiteDelete_16.png" />
+    <Resource Include="Images\FolderPage_16.png" />
+    <Resource Include="Images\PageWhiteAdd_16.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

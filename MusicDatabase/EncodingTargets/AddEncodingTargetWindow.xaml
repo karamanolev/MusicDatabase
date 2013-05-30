@@ -1,0 +1,48 @@
+﻿<Window x:Class="MusicDatabase.EncodingTargets.AddEncodingTargetWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MusicDatabase"
+        WindowStartupLocation="CenterOwner"
+        Title="AddEncodingTargetWindow" Height="250" Width="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Grid Margin="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            
+            <TextBlock Grid.Row="0" Margin="2" VerticalAlignment="Center" Text="Target Directory:" />
+            <TextBox Grid.Row="0" Grid.Column="1" Margin="2,2,84,2" Name="textMusicDirectory" />
+            <local:FolderPickerButton Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="2" Width="80" SelectedPath="{Binding ElementName=textMusicDirectory, Path=Text, Mode=TwoWay}" />
+
+            <TextBlock Grid.Row="1" Margin="2" VerticalAlignment="Center">File Naming Pattern:</TextBlock>
+            <local:FilenamePatternSelector Grid.Row="1" Grid.Column="1" Margin="2" x:Name="textFileNamingPattern" />
+            
+            <TextBlock Grid.Row="2" Margin="2" VerticalAlignment="Center">VBR Quality:</TextBlock>
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="2" HorizontalAlignment="Left" Width="160" Name="comboVbrQuality">
+                <ComboBoxItem>Quality 0 (~245 kbps)</ComboBoxItem>
+                <ComboBoxItem>Quality 1 (~225 kbps)</ComboBoxItem>
+                <ComboBoxItem>Quality 2 (~190 kbps)</ComboBoxItem>
+                <ComboBoxItem>Quality 3 (~175 kbps)</ComboBoxItem>
+                <ComboBoxItem>Quality 4 (~165 kbps)</ComboBoxItem>
+                <ComboBoxItem>Quality 5 (~130 kbps)</ComboBoxItem>
+                <ComboBoxItem>Quality 6 (~115 kbps)</ComboBoxItem>
+                <ComboBoxItem>Quality 7 (~100 kbps)</ComboBoxItem>
+                <ComboBoxItem>Quality 8 (~85 kbps)</ComboBoxItem>
+                <ComboBoxItem>Quality 9 (~65 kbps)</ComboBoxItem>
+            </ComboBox>
+        </Grid>
+        
+        <local:OKCancelBox Grid.Row="1" Margin="6,0,6,6" OKClicked="OKCancelBox_OKClicked" />
+    </Grid>
+</Window>

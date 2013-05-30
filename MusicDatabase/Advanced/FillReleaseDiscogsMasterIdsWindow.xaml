@@ -1,0 +1,17 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.Advanced.FillReleaseDiscogsMasterIdsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MusicDatabase"
+        Title="FillReleaseDiscogsMasterIdsWindow" Height="384" Width="465"
+        Closing="Window_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <ProgressBar Margin="6" Name="progressBar" />
+        
+        <TextBox Margin="6,0,6,6" Grid.Row="1" Name="textBox" VerticalScrollBarVisibility="Visible" />
+    </Grid>
+</local:MusicDatabaseWindow>

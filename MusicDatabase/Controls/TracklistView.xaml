@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="MusicDatabase.TracklistView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="800">
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="ListViewItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            </Style>
+        </Grid.Resources>
+        <ListView Grid.Column="1" Grid.Row="1"
+                  Name="listTracks">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Disc" Width="28" x:Name="columnDisc">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Disc}" HorizontalAlignment="Right"  />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Pos" Width="28">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Position}" HorizontalAlignment="Right"  />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Artists" Width="240" x:Name="columnArtists">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding JoinedArtists}" FontWeight="{Binding FontWeight}" FontStyle="{Binding FontStyle}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Title" Width="300">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Title}" FontWeight="{Binding FontWeight}" FontStyle="{Binding FontStyle}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="DR" Width="40">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Rectangle Fill="{Binding DynamicRangeBrush}" RadiusX="4" RadiusY="4" />
+                                    <TextBlock Text="{Binding DynamicRange}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Album Gain" Width="70" DisplayMemberBinding="{Binding AlbumGain}" />
+                    <GridViewColumn Header="Track Gain" Width="70" DisplayMemberBinding="{Binding TrackGain}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</UserControl>

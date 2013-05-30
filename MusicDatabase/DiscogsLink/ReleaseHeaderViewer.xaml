@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="MusicDatabase.DiscogsLink.ReleaseHeaderViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignWidth="300">
+    <StackPanel Orientation="Horizontal">
+        <StackPanel.Resources>
+            <ResourceDictionary>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Margin" Value="0 0 3 1" />
+                </Style>
+            </ResourceDictionary>
+        </StackPanel.Resources>
+
+        <Grid Margin="0 6 8 4">
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Loading..." />
+            <Image Source="{Binding Aggregate.PrimaryImage.Uri150}" Name="releaseImage" Stretch="None" VerticalAlignment="Top" Width="150" Height="150" />
+        </Grid>
+
+        <StackPanel Orientation="Vertical" Margin="0 0 0 4" VerticalAlignment="Top">
+            <StackPanel Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0 0 0 4">
+                <TextBlock FontSize="20" FontWeight="Bold" Margin="0" Text="{Binding Aggregate.JoinedArtistsFixed}" />
+                <TextBlock FontSize="20" FontWeight="Bold" Margin="0" Text=" – " />
+                <TextBlock FontSize="20" FontWeight="Bold" Margin="0" Text="{Binding Title}" />
+            </StackPanel>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="Label:" />
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Aggregate.JoinedLabels}" />
+
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Catalog Number:" />
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Aggregate.JoinedCatalogNumbers}" />
+
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="Format:" />
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Aggregate.JoinedFormats}" />
+
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Country:" />
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Country}" />
+
+                <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Top" Text="Release Date:" />
+                <TextBlock Grid.Column="1" Grid.Row="4" VerticalAlignment="Top" Text="{Binding ReleaseDate}" />
+
+                <TextBlock Grid.Column="0" Grid.Row="5" Text="Genre:" />
+                <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding Aggregate.JoinedGenres}" />
+
+                <TextBlock Grid.Column="0" Grid.Row="6" Text="Style:" />
+                <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding Aggregate.JoinedStyles}" />
+            </Grid>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

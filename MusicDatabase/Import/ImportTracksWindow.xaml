@@ -1,0 +1,62 @@
+﻿<local:MusicDatabaseWindow x:Class="MusicDatabase.Import.ImportTracksWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MusicDatabase"
+        xmlns:import="clr-namespace:MusicDatabase.Import"
+        Title="Import Tracks" Height="700" Width="1200" Closing="MusicDatabaseWindow_Closing"
+        AllowDrop="True" DragEnter="MusicDatabaseWindow_DragEnter" Drop="MusicDatabaseWindow_Drop">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="290" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TabControl Margin="6,6,0,6">
+            <TabItem Header="Details">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <local:ReleaseDetailsEditor x:Name="detailsEditor" />
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50*" />
+                            <ColumnDefinition Width="50*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Button Grid.Row="0" Grid.Column="0" Margin="2" Name="btnToolboxRenumberTracks" Click="btnRenumberTracks_Click" Content="Renumber Tracks" />
+                        <Button Grid.Row="0" Grid.Column="1" Margin="2" Name="btnToolboxCapitalizeTitles" Click="btnCapitalizeTitles_Click" Content="Capitalize" />
+                        <Button Grid.Row="1" Grid.Column="0" Margin="2" Name="btnToolboxDiscogsMatch" Click="btnDiscogsMatch_Click" Content="Discogs Match" />
+                        <Button Grid.Row="1" Grid.Column="1" Margin="2" Name="btnToolboxWikipediaMatch" Click="btnWikipediaMatch_Click" Content="Wikipedia Match" />
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Images">
+                <local:ReleaseImagesEditor Margin="2" x:Name="imagesEditor" ImageBoxWidth="256" ImageBoxHeight="200"
+                                           IsMaximizationEnabled="False" />
+            </TabItem>
+            <TabItem Header="Additional Files">
+                <local:AdditionalFilesEditor Margin="2" x:Name="additionalFilesEditor" />
+            </TabItem>
+        </TabControl>
+
+        <TabControl Grid.Column="1" Name="tabs" Margin="6" />
+        <Button Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Width="60" Margin="0,6,6,0" Click="btnRemoveDisc_Click">Remove</Button>
+        <Button Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Width="60" Margin="0,6,68,0"
+                Click="btnAddDisc_Click" AllowDrop="True" DragEnter="btnAddDisc_DragEnter" Drop="btnAddDisc_Drop">Add</Button>
+
+        <local:OKCancelBox Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,6,6" OKClicked="OKCancelBox_OKClicked" />
+        <local:NetworkEncodingStatusBox Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="6,0,0,6" Width="200" x:Name="networkBox" />
+    </Grid>
+</local:MusicDatabaseWindow>

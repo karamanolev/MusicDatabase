@@ -1,0 +1,23 @@
+﻿<my:MusicDatabaseWindow x:Class="MusicDatabase.VerificationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:my="clr-namespace:MusicDatabase"
+        Title="Verification Window" Width="300" SizeToContent="Height">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Margin="4" HorizontalAlignment="Center" Foreground="DarkRed" FontSize="20" FontWeight="Bold">Warning!</TextBlock>
+        <TextBlock Margin="6" Grid.Row="1" TextAlignment="Justify" Text="Warning, this is the warning to be shown!" Name="labelWarning" />
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="6">
+            <TextBlock xml:space="preserve" VerticalAlignment="Center" Name="labelCode">Enter 1234 to continue: </TextBlock>
+            <TextBox Name="textCode" Width="80" TextChanged="textCode_TextChanged"  />
+        </StackPanel>
+        
+        <my:OKCancelBox Grid.Row="3" x:Name="okCancelBox" Margin="6" OKClicked="OKCancelBox_OKClicked" IsOKEnabled="False" />
+    </Grid>
+</my:MusicDatabaseWindow>
