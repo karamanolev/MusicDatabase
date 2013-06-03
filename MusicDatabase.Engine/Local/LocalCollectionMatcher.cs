@@ -8,9 +8,9 @@ namespace MusicDatabase.Engine.Local
     public class LocalCollectionMatcher
     {
         private LocalCollectionScanner collectionScanner;
-        private CollectionManager collectionManager;
+        private ICollectionManager collectionManager;
 
-        public LocalCollectionMatcher(CollectionManager collectionManager)
+        public LocalCollectionMatcher(ICollectionManager collectionManager)
         {
             this.collectionScanner = new LocalCollectionScanner(collectionManager);
             this.collectionScanner.ProgressChanged += (sender, e) =>

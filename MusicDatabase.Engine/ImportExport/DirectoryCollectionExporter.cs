@@ -9,7 +9,7 @@ namespace MusicDatabase.Engine.ImportExport
     {
         private string outputPath;
 
-        public DirectoryCollectionExporter(string outputPath, CollectionManager collectionManager)
+        public DirectoryCollectionExporter(string outputPath, ICollectionManager collectionManager)
             : base(collectionManager)
         {
             this.outputPath = outputPath;

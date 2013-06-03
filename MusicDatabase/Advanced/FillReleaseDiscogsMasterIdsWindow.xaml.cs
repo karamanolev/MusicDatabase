@@ -28,7 +28,7 @@ namespace MusicDatabase.Advanced
         {
             Discogs3 discogs = new Discogs3();
 
-            Release[] releases = this.CollectionManager.Releases.ToArray().Where(r => r.DiscogsReleaseId != 0 && r.DiscogsMasterId == 0).ToArray();
+            Release[] releases = this.CollectionManager.Releases.Where(r => r.DiscogsReleaseId != 0 && r.DiscogsMasterId == 0).ToArray();
             this.Dispatcher.BeginInvokeAction(delegate
             {
                 this.progressBar.Maximum = releases.Length;
@@ -48,11 +48,12 @@ namespace MusicDatabase.Advanced
                     });
 
                     DiscogsNet.Model.Release discogsRelease = discogs.GetRelease(release.DiscogsReleaseId);
-                    using (var transaction = this.CollectionManager.BeginTransaction())
-                    {
-                        release.DiscogsMasterId = discogsRelease.MasterId;
-                        transaction.Commit();
-                    }
+                    //using (var transaction = this.CollectionManager.BeginTransaction())
+                    //{
+                    release.DiscogsMasterId = discogsRelease.MasterId;
+                    this.CollectionManager.Save(release);
+                    //transaction.Commit();
+                    //}
 
                     releaseMessage = (processed + 1) + "/" + releases.Length + ": Successful update";
                 }
@@ -81,7 +82,7 @@ namespace MusicDatabase.Advanced
         {
             this.shouldCancel = true;
             this.workerTask.Wait();
-            CollectionManager.OnCollectionChanged();
+            CollectionManagerGlobal.OnCollectionChanged();
         }
     }
 }

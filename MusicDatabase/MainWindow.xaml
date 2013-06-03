@@ -11,12 +11,12 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <Menu>
             <MenuItem Header="_File">
-                <MenuItem Header="New" Icon="{local:Icon PageWhiteAdd_16}" Click="menuNew_Click" />
-                <MenuItem Header="Open Local" Icon="{local:Icon FolderPage_16}" Click="menuOpen_Click" />
-                <MenuItem Header="Open MySQL" Icon="{local:Icon ServerDatabase_16}" Click="menuOpenMySQL_Click" />
+                <MenuItem Header="New Local Store" Icon="{local:Icon PageWhiteAdd_16}" Click="menuNew_Click" />
+                <MenuItem Header="Open Local Store" Icon="{local:Icon FolderPage_16}" Click="menuOpen_Click" />
+                <MenuItem Header="Open Mongo Server" Icon="{local:Icon ServerDatabase_16}" Click="menuOpenMongo_Click" />
                 <MenuItem Header="Close" Icon="{local:Icon PageWhiteDelete_16}" Click="menuClose_Click" IsEnabled="{Binding HasCollection}" />
                 <MenuItem Header="Backup" IsEnabled="{Binding HasCollection}">
                     <MenuItem Header="Import Backup" Click="menuImportXml_Click" />
@@ -51,7 +51,7 @@
                           Click="menuCollectionSettings_Click" IsEnabled="{Binding HasCollection}"  />
                 <MenuItem Header="Statistics" Icon="{local:Icon Sum_16}"
                           Click="menuStatistics_Click" IsEnabled="{Binding HasCollection}" />
-                
+
                 <MenuItem Header="Advanced">
                     <MenuItem Header="Clear Window Settings" Click="menuClearWindowSettings_Click" />
                     <MenuItem Header="Audio Checksum" Click="menuAudioChecksum_Click" />
@@ -64,12 +64,15 @@
                     <MenuItem Header="Update All Releases Thumbnails" Click="btnUpdateReleasesThumbnails_Click" />
                     <MenuItem Header="Test Import Export Releases" Click="btnTestImportExportReleases_Click" />
                     <MenuItem Header="Audio Format Analysis" Click="btnAudioFormatAnalysis_Click" />
-                    <MenuItem Header="Recalculate ReplayGain" Click="btnRecalculateReplayGain_Click" />
-                    <MenuItem Header="Recalculate DynamicRange" Click="btnRecalculateDynamicRange_Click" />
+                    <MenuItem Header="Recalculate ReplayGain For All" Click="btnRecalculateReplayGainAll_Click" />
+                    <MenuItem Header="Recalculate ReplayGain For This" Click="btnRecalculateReplayGainThis_Click" />
+                    <MenuItem Header="Recalculate DynamicRange For All" Click="btnRecalculateDynamicRangeAll_Click" />
+                    <MenuItem Header="Recalculate DynamicRange For This" Click="btnRecalculateDynamicRangeThis_Click" />
+                    <MenuItem Header="Fill Missing Cover Art" Click="btnFillMissingCoverArt_Click" />
                 </MenuItem>
             </MenuItem>
         </Menu>
-        
+
         <local:MainCollectionView Grid.Row="1" x:Name="mainCollectionView" Margin="4,2,4,4" />
 
         <StatusBar Grid.Row="2">

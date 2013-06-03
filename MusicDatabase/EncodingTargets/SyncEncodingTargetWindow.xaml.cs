@@ -26,10 +26,10 @@ namespace MusicDatabase.EncodingTargets
         private bool cancelScanning;
         private EncodingTargetScanResult scanResult;
 
-        public SyncEncodingTargetWindow(ICollectionSessionFactory collectionSessionFactory, int encodingTargetId)
+        public SyncEncodingTargetWindow(ICollectionSessionFactory collectionSessionFactory, EncodingTarget encodingTarget)
             : base(collectionSessionFactory)
         {
-            this.encodingTarget = this.CollectionManager.Settings.EncodingTargets.Where(t => t.Id == encodingTargetId).FirstOrDefault();
+            this.encodingTarget = encodingTarget;
 
             InitializeComponent();
 
@@ -118,19 +118,24 @@ namespace MusicDatabase.EncodingTargets
                 IEncoderFactory encoderFactory;
                 if (this.CollectionManager.Settings.NetworkEncoding)
                 {
-                    encoderFactory = new RemoteMp3EncoderFactory(this.networkBox.Servers, this.encodingTarget.Mp3Settings.VbrQuality, localConcurrencyLevel, false);
+                    encoderFactory = new RemoteMp3EncoderFactory(this.networkBox.Servers, this.encodingTarget.Mp3Settings.VbrQuality, localConcurrencyLevel, false, false);
                 }
                 else
                 {
-                    encoderFactory = new LocalMp3EncoderFactory(this.encodingTarget.Mp3Settings.VbrQuality, localConcurrencyLevel, false);
+                    encoderFactory = new LocalMp3EncoderFactory(this.encodingTarget.Mp3Settings.VbrQuality, localConcurrencyLevel, false, false);
                 }
 
-                IEncoderFactory replayGainFactory = new DspEncoderFactory(this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true, false);
+                IEncoderFactory replayGainFactory = new DspEncoderFactory(this.SettingsManager.Settings.ActualLocalConcurrencyLevel, false, false);
 
                 List<IParallelTask> tasks = new List<IParallelTask>();
                 foreach (var release in this.scanResult.ReleasesToEncode)
                 {
-                    List<FileEncodeTask> releaseTasks = new List<FileEncodeTask>();
+                    var rgTask = new ReplayGainTask(replayGainFactory, release, false, false, false);
+
+                    if (!release.Tracklist.All(t => AudioHelper.IsSupportedAudioSource(t.RelativeFilename)))
+                    {
+                        continue;
+                    }
                     
                     foreach (Track track in release.Tracklist)
                     {
@@ -160,15 +165,15 @@ namespace MusicDatabase.EncodingTargets
                         };
 
                         tasks.Add(encodeTask);
-                        releaseTasks.Add(encodeTask);
+                        rgTask.AddItem(track, encodeTask);
                     }
 
-                    tasks.Add(new ReplayGainTask(replayGainFactory, releaseTasks.ToArray(), false));
+                    tasks.Add(rgTask);
                 }
 
                 int concurrency = Math.Max(encoderFactory.ThreadCount, replayGainFactory.ThreadCount);
                 EncoderController controller = new EncoderController(tasks.ToArray(), concurrency);
-                controller.DeleteSuccessfullyEncodedItems = false;
+                controller.DeleteSuccessfullyEncodedItemsIfFailure = false;
                 EncodingWindow window = new EncodingWindow(controller);
                 window.ShowDialog(this);
             }

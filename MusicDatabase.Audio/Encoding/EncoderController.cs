@@ -17,11 +17,11 @@ namespace MusicDatabase.Audio.Encoding
 
         public EncoderControllerStatus Status { get; private set; }
         public IParallelTask[] Tasks { get; private set; }
-        public bool DeleteSuccessfullyEncodedItems { get; set; }
+        public bool DeleteSuccessfullyEncodedItemsIfFailure { get; set; }
 
         public EncoderController(IParallelTask[] tasks, int concurrency)
         {
-            this.DeleteSuccessfullyEncodedItems = true;
+            this.DeleteSuccessfullyEncodedItemsIfFailure = true;
             this.Tasks = tasks;
 
             this.tasksRemaining = new BlockingCollection<IParallelTask>();
@@ -64,7 +64,7 @@ namespace MusicDatabase.Audio.Encoding
                     }
                 }
 
-                if (this.DeleteSuccessfullyEncodedItems)
+                if (this.DeleteSuccessfullyEncodedItemsIfFailure)
                 {
                     this.DeleteAllFiles();
                 }
@@ -76,14 +76,14 @@ namespace MusicDatabase.Audio.Encoding
 
             if (this.Tasks.Any(t => t.Status == EncodeTaskStatus.Cancelled))
             {
-                if (this.DeleteSuccessfullyEncodedItems)
+                if (this.DeleteSuccessfullyEncodedItemsIfFailure)
                 {
                     this.DeleteAllFiles();
                 }
 
                 foreach (IParallelTask task in this.Tasks)
                 {
-                    if (this.DeleteSuccessfullyEncodedItems || task.Status == EncodeTaskStatus.Waiting)
+                    if (this.DeleteSuccessfullyEncodedItemsIfFailure || task.Status == EncodeTaskStatus.Waiting)
                     {
                         task.Status = EncodeTaskStatus.Cancelled;
                     }
@@ -143,6 +143,13 @@ namespace MusicDatabase.Audio.Encoding
                     task.Progress = 1;
                 }
                 catch (SkipEncodingItemException e)
+                {
+                    task.Status = EncodeTaskStatus.Skipped;
+                    task.Progress = 1;
+                    task.EncoderFactory.TryDeleteResult(task);
+                    Utility.WriteToErrorLog("Skipped encoding item: " + e.Message);
+                }
+                catch (UnsupportedBitsPerSampleException e)
                 {
                     task.Status = EncodeTaskStatus.Skipped;
                     task.Progress = 1;

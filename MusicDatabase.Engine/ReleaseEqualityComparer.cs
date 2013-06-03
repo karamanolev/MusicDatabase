@@ -29,7 +29,7 @@ namespace MusicDatabase.Engine
             return this.Equals(null, x, null, y);
         }
 
-        public bool Equals(CollectionManager xm, Release x, CollectionManager ym, Release y)
+        public bool Equals(ICollectionManager xm, Release x, ICollectionManager ym, Release y)
         {
             if (!this.compareObjects.Compare(x, y))
             {

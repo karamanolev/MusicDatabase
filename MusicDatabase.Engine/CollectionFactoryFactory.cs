@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using MusicDatabase.Engine.Database.MongoDB;
+using MusicDatabase.Engine.Database.SQLite;
 
 namespace MusicDatabase.Engine
 {
@@ -7,20 +9,23 @@ namespace MusicDatabase.Engine
     {
         public static readonly string SQLitePrefix = "sqlite://";
         public static readonly string MySQLPrefix = "mysql://";
+        public static readonly string MongoDBPrefix = "mongodb://";
 
         public static ICollectionSessionFactory CreateFactory(string databasePath)
         {
             if (databasePath.StartsWith(SQLitePrefix))
             {
                 databasePath = databasePath.Substring(SQLitePrefix.Length);
-                return new CollectionSessionFactory_SQLite(databasePath);
+                return new SQLiteSessionFactory(databasePath);
             }
             else if (databasePath.StartsWith(MySQLPrefix))
             {
-                databasePath = databasePath.Substring(MySQLPrefix.Length);
-                return new CollectionSessionFactory_MySQL(databasePath);
+                //databasePath = databasePath.Substring(MySQLPrefix.Length);
             }
-
+            else if (databasePath.StartsWith(MongoDBPrefix))
+            {
+                return new MongoSessionFactory(databasePath);
+            }
             throw new NotSupportedException("Unsupported database path: " + databasePath);
         }
     }

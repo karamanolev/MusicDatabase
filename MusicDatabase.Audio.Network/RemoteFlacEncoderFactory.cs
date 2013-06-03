@@ -8,69 +8,49 @@ using MusicDatabase.Engine;
 
 namespace MusicDatabase.Audio.Network
 {
-    public class RemoteFlacEncoderFactory : IEncoderFactory
+    public class RemoteFlacEncoderFactory : EncoderFactoryBase
     {
         private DiscoveryServerDescriptor[] servers;
         private int compressionLevel;
         private int concurrencylevel;
-        private bool calculateDr;
 
-        public int ThreadCount
-        {
-            get { return this.concurrencylevel + servers.Select(s => s.ThreadCount).Sum(); }
-        }
-
-        public RemoteFlacEncoderFactory(DiscoveryServerDescriptor[] servers, int compressionLevel, int concurrencyLevel, bool calculateDr)
+        public RemoteFlacEncoderFactory(DiscoveryServerDescriptor[] servers, int compressionLevel, int concurrencyLevel, bool calculateRg, bool calculateDr)
+            : base(calculateRg, calculateDr)
         {
             this.concurrencylevel = concurrencyLevel;
 
             this.servers = servers;
             this.compressionLevel = compressionLevel;
-            this.calculateDr = calculateDr;
+
+            this.ThreadCount = this.concurrencylevel + servers.Select(s => s.ThreadCount).Sum();
         }
 
-        public void TryDeleteResult(IParallelTask _task)
+        public override void TryDeleteResult(IParallelTask _task)
         {
             FileEncodeTask task = (FileEncodeTask)_task;
             Utility.TryDeleteFile(task.TargetFilename);
             Utility.TryDeleteEmptyFoldersToTheRoot(Path.GetDirectoryName(task.TargetFilename));
         }
 
-        public IEncoder CreateEncoder(int threadNumber, IParallelTask _task)
+        protected override IEncoder CreateEncoderInternal(int threadNumber, FileEncodeTask task, IAudioSource audioSource)
         {
-            FileEncodeTask task = (FileEncodeTask)_task;
-            IAudioSource audioSource = task.AudioSourceLazy();
-            task.TrackGain = DspHelper.CreateTrackGain(audioSource);
-            if (this.calculateDr)
+            if (threadNumber < this.concurrencylevel)
             {
-                task.DrMeter = DspHelper.CreateDrMeter(audioSource);
+                return new NativeFlacEncoder(audioSource, task.TargetFilename, task.Tag, compressionLevel, task.TrackGain, task.DrMeter);
             }
 
-            try
+            threadNumber -= this.concurrencylevel;
+
+            foreach (DiscoveryServerDescriptor server in this.servers)
             {
-                if (threadNumber < this.concurrencylevel)
+                if (threadNumber < server.ThreadCount)
                 {
-                    return new NativeFlacEncoder(audioSource, task.TargetFilename, task.Tag, compressionLevel, task.TrackGain, task.DrMeter);
+                    return new RemoteFlacEncoder(server.Address, audioSource, task.TargetFilename, task.Tag, this.compressionLevel, task.TrackGain, task.DrMeter);
                 }
-
-                threadNumber -= this.concurrencylevel;
-
-                foreach (DiscoveryServerDescriptor server in this.servers)
-                {
-                    if (threadNumber < server.ThreadCount)
-                    {
-                        return new RemoteFlacEncoder(server.Address, audioSource, task.TargetFilename, task.Tag, this.compressionLevel, task.TrackGain, task.DrMeter);
-                    }
-                    threadNumber -= server.ThreadCount;
-                }
-
-                throw new ArgumentException("threadNumber is too large.");
+                threadNumber -= server.ThreadCount;
             }
-            catch
-            {
-                audioSource.Close();
-                throw;
-            }
+
+            throw new ArgumentException("threadNumber is too large.");
         }
     }
 }

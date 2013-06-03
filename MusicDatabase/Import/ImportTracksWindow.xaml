@@ -7,7 +7,7 @@
         AllowDrop="True" DragEnter="MusicDatabaseWindow_DragEnter" Drop="MusicDatabaseWindow_Drop">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="290" />
+            <ColumnDefinition Width="330" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -43,8 +43,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Images">
-                <local:ReleaseImagesEditor Margin="2" x:Name="imagesEditor" ImageBoxWidth="256" ImageBoxHeight="200"
-                                           IsMaximizationEnabled="False" />
+                <local:ReleaseImagesEditor Margin="2" x:Name="imagesEditor" ImageBoxWidth="256" ImageBoxHeight="200" />
             </TabItem>
             <TabItem Header="Additional Files">
                 <local:AdditionalFilesEditor Margin="2" x:Name="additionalFilesEditor" />

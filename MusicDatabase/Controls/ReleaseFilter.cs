@@ -29,10 +29,29 @@ namespace MusicDatabase
         public bool? IsFlagged { get; set; }
         public bool? HasWikiPage { get; set; }
         public bool DoExtendedSearch { get; set; }
+        public Func<Release, bool> FilterFunction { get; set; }
+
+        private Func<Release, bool> ActualFilterFunction
+        {
+            get
+            {
+                if (this.SearchString.StartsWith("{ ") && this.SearchString.EndsWith(" }"))
+                {
+                    return this.FilterFunction;
+                }
+                return null;
+            }
+        }
 
         public bool Match(Release release)
         {
-            if (this.searchParts.Length > 0)
+            var filter = this.ActualFilterFunction;
+            if (filter != null && !filter(release))
+            {
+                return false;
+            }
+
+            if (filter == null && this.searchParts.Length > 0)
             {
                 List<string> releaseSearchParts = new List<string>();
 

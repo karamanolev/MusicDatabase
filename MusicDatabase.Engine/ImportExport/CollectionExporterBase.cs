@@ -9,9 +9,9 @@ namespace MusicDatabase.Engine.ImportExport
 {
     public abstract class CollectionExporterBase : IDisposable
     {
-        protected CollectionManager collectionManager;
+        protected ICollectionManager collectionManager;
 
-        public CollectionExporterBase(CollectionManager collectionManager)
+        public CollectionExporterBase(ICollectionManager collectionManager)
         {
 
             this.collectionManager = collectionManager;
@@ -55,44 +55,43 @@ namespace MusicDatabase.Engine.ImportExport
             }
         }
 
+
         private void ExportRelease(XmlWriter writer, Release release)
         {
-            writer.WriteStartElement("release");
+            writer.WriteStartElement(Keys.Release);
 
-            writer.WriteAttributeString("joinedAlbumArtists", release.JoinedAlbumArtists);
-            writer.WriteAttributeString("title", release.Title);
-            writer.WriteAttributeString("releaseDate", release.ReleaseDate.ToString());
-            writer.WriteAttributeString("originalReleaseDate", release.OriginalReleaseDate.ToString());
-            writer.WriteAttributeString("catalogNumber", release.CatalogNumber);
-            writer.WriteAttributeString("label", release.Label);
-            writer.WriteAttributeString("country", release.Country);
-            writer.WriteAttributeString("discCount", release.DiscCount.ToString());
+            writer.WriteAttributeString(Keys.JoinedAlbumArtists, release.JoinedAlbumArtists);
+            writer.WriteAttributeString(Keys.Title, release.Title);
+            writer.WriteAttributeString(Keys.ReleaseDate, release.ReleaseDate.ToString());
+            writer.WriteAttributeString(Keys.OriginalReleaseDate, release.OriginalReleaseDate.ToString());
+            writer.WriteAttributeString(Keys.CatalogNumber, release.CatalogNumber);
+            writer.WriteAttributeString(Keys.Label, release.Label);
+            writer.WriteAttributeString(Keys.Country, release.Country);
+            writer.WriteAttributeString(Keys.Genre, release.Genre);
+            writer.WriteAttributeString(Keys.DateAdded, release.DateAdded.Ticks.ToString());
+            writer.WriteAttributeString(Keys.DateAudioModified, release.DateAudioModified.Ticks.ToString());
+            writer.WriteAttributeString(Keys.DateModified, release.DateModified.Ticks.ToString());
+            writer.WriteAttributeString(Keys.Score, release.Score.ToString());
+            writer.WriteAttributeString(Keys.DynamicRange, release.DynamicRange.ToString());
+            writer.WriteAttributeString(Keys.AlbumGain, release.ReplayGainAlbumGain.ToString());
+            writer.WriteAttributeString(Keys.AlbumPeak, release.ReplayGainAlbumPeak.ToString());
+            writer.WriteAttributeString(Keys.Notes, release.Notes);
             if (release.IsFlagged)
             {
-                writer.WriteAttributeString("flagMessage", release.FlagMessage);
+                writer.WriteAttributeString(Keys.FlagMessage, release.FlagMessage);
             }
-            writer.WriteAttributeString("notes", release.Notes);
             if (!string.IsNullOrEmpty(release.WikipediaPageName))
             {
-                writer.WriteAttributeString("wikipediaPageName", release.WikipediaPageName);
+                writer.WriteAttributeString(Keys.WikipediaPageName, release.WikipediaPageName);
             }
             if (release.DiscogsReleaseId != 0)
             {
-                writer.WriteAttributeString("discogsReleaseId", release.DiscogsReleaseId.ToString());
+                writer.WriteAttributeString(Keys.DiscogsReleaseId, release.DiscogsReleaseId.ToString());
             }
             if (release.DiscogsMasterId != 0)
             {
-                writer.WriteAttributeString("discogsMasterId", release.DiscogsMasterId.ToString());
+                writer.WriteAttributeString(Keys.DiscogsMasterId, release.DiscogsMasterId.ToString());
             }
-            writer.WriteAttributeString("genre", release.Genre);
-
-            writer.WriteAttributeString("dateAdded", release.DateAdded.Ticks.ToString());
-            writer.WriteAttributeString("dateAudioModified", release.DateAudioModified.Ticks.ToString());
-            writer.WriteAttributeString("dateModified", release.DateModified.Ticks.ToString());
-            writer.WriteAttributeString("score", release.Score.ToString());
-            writer.WriteAttributeString("dynamicRange", release.DynamicRange.ToString());
-            writer.WriteAttributeString("albumGain", release.ReplayGainAlbumGain.ToString());
-            writer.WriteAttributeString("albumPeak", release.ReplayGainAlbumPeak.ToString());
 
             this.ExportReleaseArtists(writer, release);
             this.ExportReleaseTracklist(writer, release);
@@ -104,7 +103,7 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ExportReleaseArtists(XmlWriter writer, Release release)
         {
-            writer.WriteStartElement("artists");
+            writer.WriteStartElement(Keys.Artists);
 
             ReleaseArtist[] artists;
             try
@@ -135,12 +134,12 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ExportReleaseArtist(XmlWriter writer, ReleaseArtist releaseArtist)
         {
-            writer.WriteStartElement("artist");
+            writer.WriteStartElement(Keys.Artist);
 
-            writer.WriteAttributeString("name", releaseArtist.Artist.Name);
+            writer.WriteAttributeString(Keys.Name, releaseArtist.Artist.Name);
             if (!string.IsNullOrEmpty(releaseArtist.JoinString))
             {
-                writer.WriteAttributeString("join", releaseArtist.JoinString);
+                writer.WriteAttributeString(Keys.JoinString, releaseArtist.JoinString);
             }
 
             writer.WriteEndElement();
@@ -148,7 +147,7 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ExportReleaseAdditionalFiles(XmlWriter writer, Release release)
         {
-            writer.WriteStartElement("additionalFiles");
+            writer.WriteStartElement(Keys.AdditionalFiles);
 
             foreach (ReleaseAdditionalFile additionalFile in release.AdditionalFiles)
             {
@@ -160,11 +159,11 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ExportAdditionalFile(XmlWriter writer, ReleaseAdditionalFile additionalFile)
         {
-            writer.WriteStartElement("additionalFile");
+            writer.WriteStartElement(Keys.AdditionalFile);
 
-            writer.WriteAttributeString("type", additionalFile.Type.ToString());
-            writer.WriteAttributeString("description", additionalFile.Description);
-            writer.WriteAttributeString("originalFilename", additionalFile.OriginalFilename);
+            writer.WriteAttributeString(Keys.Type, additionalFile.Type.ToString());
+            writer.WriteAttributeString(Keys.Description, additionalFile.Description);
+            writer.WriteAttributeString(Keys.OriginalFilename, additionalFile.OriginalFilename);
             writer.WriteBase64(additionalFile.File, 0, additionalFile.File.Length);
 
             writer.WriteEndElement();
@@ -172,7 +171,7 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ExportReleaseImages(XmlWriter writer, Release release)
         {
-            writer.WriteStartElement("images");
+            writer.WriteStartElement(Keys.Images);
 
             foreach (Image image in release.Images)
             {
@@ -184,17 +183,17 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ExportImage(XmlWriter writer, Image image)
         {
-            writer.WriteStartElement("image");
+            writer.WriteStartElement(Keys.Image);
 
-            writer.WriteAttributeString("type", image.Type.ToString());
+            writer.WriteAttributeString(Keys.Type, image.Type.ToString());
             if (image.MimeType == "application/unknown")
             {
                 image.MimeType = MimeHelper.GetMimeTypeForExtension(image.Extension);
             }
-            writer.WriteAttributeString("mimeType", image.MimeType);
-            writer.WriteAttributeString("extension", image.Extension);
-            writer.WriteAttributeString("description", image.Description);
-            writer.WriteAttributeString("isMain", image.IsMain.ToString());
+            writer.WriteAttributeString(Keys.MimeType, image.MimeType);
+            writer.WriteAttributeString(Keys.Extension, image.Extension);
+            writer.WriteAttributeString(Keys.Description, image.Description);
+            writer.WriteAttributeString(Keys.IsMain, image.IsMain.ToString());
 
             byte[] imageBytes = this.collectionManager.ImageHandler.LoadImage(image);
             writer.WriteBase64(imageBytes, 0, imageBytes.Length);
@@ -204,7 +203,7 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ExportReleaseTracklist(XmlWriter writer, Release release)
         {
-            writer.WriteStartElement("tracks");
+            writer.WriteStartElement(Keys.Tracks);
 
             foreach (Track track in release.Tracklist)
             {
@@ -216,19 +215,19 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ExportTrack(XmlWriter writer, Track track)
         {
-            writer.WriteStartElement("track");
+            writer.WriteStartElement(Keys.Track);
 
-            writer.WriteAttributeString("disc", track.Disc.ToString());
-            writer.WriteAttributeString("position", track.Position.ToString());
-            writer.WriteAttributeString("title", track.Title);
+            writer.WriteAttributeString(Keys.Disc, track.Disc.ToString());
+            writer.WriteAttributeString(Keys.Position, track.Position.ToString());
+            writer.WriteAttributeString(Keys.Title, track.Title);
             if (!string.IsNullOrEmpty(track.JoinedArtists))
             {
-                writer.WriteAttributeString("joinedArtists", track.JoinedArtists);
+                writer.WriteAttributeString(Keys.JoinedArtists, track.JoinedArtists);
             }
-            writer.WriteAttributeString("relativeFilename", track.RelativeFilename);
-            writer.WriteAttributeString("dynamicRange", track.DynamicRange.ToString());
-            writer.WriteAttributeString("trackGain", track.ReplayGainTrackGain.ToString());
-            writer.WriteAttributeString("trackPeak", track.ReplayGainTrackPeak.ToString());
+            writer.WriteAttributeString(Keys.RelativeFilename, track.RelativeFilename);
+            writer.WriteAttributeString(Keys.DynamicRange, track.DynamicRange.ToString());
+            writer.WriteAttributeString(Keys.TrackGain, track.ReplayGainTrackGain.ToString());
+            writer.WriteAttributeString(Keys.TrackPeak, track.ReplayGainTrackPeak.ToString());
 
             this.ExportTrackArtists(writer, track);
 
@@ -239,7 +238,7 @@ namespace MusicDatabase.Engine.ImportExport
         {
             if (!string.IsNullOrEmpty(track.JoinedArtists))
             {
-                writer.WriteStartElement("artists");
+                writer.WriteStartElement(Keys.Artists);
 
                 TrackArtist[] artists = null;
                 try
@@ -275,12 +274,12 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ExportTrackArtist(XmlWriter writer, TrackArtist releaseArtist)
         {
-            writer.WriteStartElement("artist");
+            writer.WriteStartElement(Keys.Artist);
 
-            writer.WriteAttributeString("name", releaseArtist.Artist.Name);
+            writer.WriteAttributeString(Keys.Name, releaseArtist.Artist.Name);
             if (!string.IsNullOrEmpty(releaseArtist.JoinString))
             {
-                writer.WriteAttributeString("join", releaseArtist.JoinString);
+                writer.WriteAttributeString(Keys.JoinString, releaseArtist.JoinString);
             }
 
             writer.WriteEndElement();

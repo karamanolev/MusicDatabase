@@ -14,12 +14,12 @@ namespace MusicDatabase.DiscogsLink
     class DiscogsReleaseMerger
     {
         private Window window;
-        private CollectionManager collectionManager;
+        private ICollectionManager collectionManager;
         private Release release;
         private ReleaseImagesEditor imagesEditor;
         private List<IEnumerable<Tuple<Track, string>>> discs;
 
-        public DiscogsReleaseMerger(Window window, CollectionManager collectionManager, Release release, ReleaseImagesEditor imagesEditor)
+        public DiscogsReleaseMerger(Window window, ICollectionManager collectionManager, Release release, ReleaseImagesEditor imagesEditor)
         {
             this.window = window;
             this.collectionManager = collectionManager;

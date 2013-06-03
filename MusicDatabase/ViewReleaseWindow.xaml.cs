@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using MusicDatabase.Engine;
+using MusicDatabase.Engine.Database;
 using MusicDatabase.Engine.Entities;
 using MusicDatabase.Engine.ImportExport;
 
@@ -16,7 +16,7 @@ namespace MusicDatabase
         private Release release;
 
         public ViewReleaseWindow()
-            : base(new CollectionSessionFactory_SQLiteMemory())
+            : base(new MemorySessionFactory())
         {
             InitializeComponent();
 
@@ -35,7 +35,7 @@ namespace MusicDatabase
 
             new Task(() =>
             {
-                using (XmlReleaseImporter xmlReleaseImporter = new XmlReleaseImporter(path, this.CollectionManager, UIHelper.UpdateReleaseThumbnail))
+                using (XmlReleaseImporter xmlReleaseImporter = new XmlReleaseImporter(path, this.CollectionManager))
                 {
                     this.release = xmlReleaseImporter.ImportRelease();
                 }

@@ -13,7 +13,7 @@ namespace MusicDatabase.Import
 {
     public partial class ImportTracksDiscEditor : UserControl
     {
-        private CollectionManager collectionManager;
+        private ICollectionManager collectionManager;
 
         public int Disc { get; set; }
 
@@ -50,7 +50,7 @@ namespace MusicDatabase.Import
             }
         }
 
-        public ImportTracksDiscEditor(CollectionManager collectionManager)
+        public ImportTracksDiscEditor(ICollectionManager collectionManager)
         {
             this.collectionManager = collectionManager;
             this.DataContext = this;
@@ -183,7 +183,7 @@ namespace MusicDatabase.Import
             this.Release.Tracklist.Insert(index + 1, track); // Will be inserted at 0 if there are no matching tracks.
         }
 
-        public void CommitChanges(CollectionManager collectionManager)
+        public void CommitChanges(ICollectionManager collectionManager)
         {
             bool hasTrackArtists = this.Release.Tracklist.Any(t => !string.IsNullOrEmpty(t.JoinedArtists));
             foreach (ImportTrackItem track in this.Tracks)

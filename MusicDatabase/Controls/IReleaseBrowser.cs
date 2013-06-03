@@ -7,13 +7,13 @@ namespace MusicDatabase
 {
     public interface IReleaseBrowser
     {
-        CollectionManager CollectionManager { get; set; }
+        ICollectionManager CollectionManager { get; set; }
         string[] AlbumArtists { get; }
         bool IsEnabled { get; set; }
 
-        int[] GetReleaseIdsByAlbumArtist(string albumArtist);
-        object GetSelectedItem();
+        string[] GetReleaseIdsByAlbumArtist(string albumArtist);
+        SelectionInfo GetSelectedItem();
         void LoadReleases(Release[] releases);
-        bool SetSelectedItem(object item);
+        bool SetSelectedItem(SelectionInfo info);
     }
 }

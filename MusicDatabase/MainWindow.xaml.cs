@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Win32;
 using MusicDatabase.Advanced;
 using MusicDatabase.EncodingTargets;
 using MusicDatabase.Engine;
 using MusicDatabase.Engine.Entities;
-using MusicDatabase.Engine.ImportExport;
+using MusicDatabase.Helpers;
 using MusicDatabase.Import;
-using MusicDatabase.Audio.Encoding;
-using MusicDatabase.Audio;
-using NHibernate;
+using Microsoft.Win32;
 
 namespace MusicDatabase
 {
@@ -26,7 +22,7 @@ namespace MusicDatabase
         #region Fields
 
         private ICollectionSessionFactory collectionSessionFactory;
-        private CollectionManager collectionManager;
+        private ICollectionManager collectionManager;
 
         #endregion
 
@@ -123,25 +119,15 @@ namespace MusicDatabase
             this.UpdateUI();
         }
 
-        private void OpenCollectionSQLite(string filePath)
-        {
-            this.OpenCollection(CollectionFactoryFactory.SQLitePrefix + filePath);
-        }
-
-        private void OpenCollectionMySQL(string host, string user, string pass, string db)
-        {
-            this.OpenCollection(CollectionFactoryFactory.MySQLPrefix + CollectionSessionFactory_MySQL.MakeConnectionString(host, user, pass, db));
-        }
-
         private void OpenCollection(string databasePath)
         {
             ICollectionSessionFactory newCollectionSessionFactory;
-            CollectionManager newCollectionManager;
+            ICollectionManager newCollectionManager;
 
             try
             {
                 newCollectionSessionFactory = CollectionFactoryFactory.CreateFactory(databasePath);
-                newCollectionManager = new CollectionManager(newCollectionSessionFactory);
+                newCollectionManager = newCollectionSessionFactory.CreateCollectionManager();
 
                 if (newCollectionManager.Settings == null && !this.EditCollectionSettings(newCollectionSessionFactory))
                 {
@@ -166,52 +152,6 @@ namespace MusicDatabase
             this.HasCollection = true;
 
             this.UpdateUI();
-
-            //using (var transaction = this.collectionManager.BeginTransaction())
-            //{
-            //    foreach (Release release in this.collectionManager.Releases.ToArray())
-            //    {
-            //        if (release.Tracklist.Any(t => t.RelativeFilename.ToLower().EndsWith(".mp3")))
-            //        {
-            //            continue;
-            //        }
-
-            //        double albumGain = double.NaN;
-            //        double albumPeak = double.NaN;
-
-            //        foreach (Track track in release.Tracklist)
-            //        {
-            //            string filename = track.GetAbsoluteFilename(this.collectionManager);
-            //            TagLib.File file = TagLib.File.Create(filename);
-
-            //            if (double.IsNaN(albumGain))
-            //            {
-            //                albumGain = file.Tag.ReplayGainAlbumGain;
-            //            }
-            //            else if (file.Tag.ReplayGainAlbumGain != albumGain)
-            //            {
-            //                throw new Exception();
-            //            }
-
-            //            if (double.IsNaN(albumPeak))
-            //            {
-            //                albumPeak = file.Tag.ReplayGainAlbumPeak;
-            //            }
-            //            else if (file.Tag.ReplayGainAlbumPeak != albumPeak)
-            //            {
-            //                throw new Exception();
-            //            }
-
-            //            track.ReplayGainTrackGain = file.Tag.ReplayGainTrackGain;
-            //            track.ReplayGainTrackPeak = file.Tag.ReplayGainTrackPeak;
-            //        }
-
-            //        release.ReplayGainAlbumGain = albumGain;
-            //        release.ReplayGainAlbumPeak = albumPeak;
-            //    }
-
-            //    transaction.Commit();
-            //}
         }
 
         private void UpdateUI()
@@ -231,8 +171,8 @@ namespace MusicDatabase
             {
                 this.statusBarDatabase.Content = this.collectionSessionFactory.DatabasePath;
 
-                int releases = this.collectionManager.Releases.Count();
-                int albumArtists = new HashSet<string>(this.collectionManager.Releases.Select(r => r.JoinedAlbumArtists)).Count;
+                int releases = this.collectionManager.ReleaseCount;
+                int albumArtists = this.collectionManager.Releases.Select(r => r.JoinedAlbumArtists).Distinct().ToArray().Length;
                 this.statusBarDatabaseInfo.Content = releases + " releases, " + albumArtists + " album artists";
             }
         }
@@ -314,7 +254,7 @@ namespace MusicDatabase
         {
             MenuItem menuItem = (MenuItem)sender;
             EncodingTarget encodingTarget = (EncodingTarget)menuItem.Tag;
-            SyncEncodingTargetWindow syncEncodingTargetWindow = new SyncEncodingTargetWindow(this.collectionSessionFactory, encodingTarget.Id);
+            SyncEncodingTargetWindow syncEncodingTargetWindow = new SyncEncodingTargetWindow(this.collectionSessionFactory, encodingTarget);
             syncEncodingTargetWindow.Show(this);
         }
 
@@ -324,7 +264,7 @@ namespace MusicDatabase
             saveDialog.Filter = "SQLite 3 Databases (*.s3db)|*.s3db";
             if (saveDialog.ShowDialog() == true)
             {
-                this.OpenCollectionSQLite(saveDialog.FileName);
+                this.OpenCollection(CollectionFactoryFactory.SQLitePrefix + saveDialog.FileName);
             }
         }
 
@@ -334,16 +274,16 @@ namespace MusicDatabase
             saveDialog.Filter = "SQLite 3 Databases (*.s3db)|*.s3db";
             if (saveDialog.ShowDialog() == true)
             {
-                this.OpenCollectionSQLite(saveDialog.FileName);
+                this.OpenCollection(CollectionFactoryFactory.SQLitePrefix + saveDialog.FileName);
             }
         }
 
-        private void menuOpenMySQL_Click(object sender, RoutedEventArgs e)
+        private void menuOpenMongo_Click(object sender, RoutedEventArgs e)
         {
-            MySQLConnectionParamsWindow paramsWindow = new MySQLConnectionParamsWindow();
+            DatabaseConnectionParamsWindow paramsWindow = new DatabaseConnectionParamsWindow();
             if (paramsWindow.ShowDialog(this) == true)
             {
-                this.OpenCollectionMySQL(paramsWindow.textHost.Text, paramsWindow.textUser.Text, paramsWindow.textPass.Password, paramsWindow.textDatabase.Text);
+                this.OpenCollection(paramsWindow.ConnectionString);
             }
         }
 
@@ -424,7 +364,7 @@ namespace MusicDatabase
             ImportTracksWindow window = new ImportTracksWindow(this.collectionSessionFactory);
             if (window.ShowDialog(this) == true)
             {
-                this.mainCollectionView.SetSelectedItem(window.InsertedReleaseId);
+                this.mainCollectionView.SetSelectedItem(SelectionInfo.Release(window.InsertedReleaseId));
             }
         }
 
@@ -448,142 +388,42 @@ namespace MusicDatabase
 
         private void menuExportArchivedXml_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Zip Files (*.zip)|*.zip|" + Utility.AllFilesFilter;
-            saveFileDialog.FileName = "Export_" + DateTime.Now.ToString("yyyy_MM_dd") + ".zip";
-            if (saveFileDialog.ShowDialog() == true)
+            using (ArchivedExportHelper helper = new ArchivedExportHelper(this, this.collectionSessionFactory))
             {
-                WaitWindow waitWindow = new WaitWindow("Exporting collection...");
-                waitWindow.ShowDialog(this, () =>
-                {
-                    using (CollectionManager exportManager = new Engine.CollectionManager(this.collectionSessionFactory))
-                    {
-                        using (CollectionExporterBase exporter = new ArchivedCollectionExporter(saveFileDialog.FileName, exportManager))
-                        {
-                            exporter.Export();
-                        }
-                    }
-                });
+                helper.Run();
             }
         }
 
         private void menuExportXml_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog();
-            folderDialog.ShowNewFolderButton = true;
-            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            using (DirectoryExportHelper helper = new DirectoryExportHelper(this, this.collectionSessionFactory))
             {
-                string path = folderDialog.SelectedPath;
-
-                if (Directory.GetFiles(path).Length != 0 || Directory.GetDirectories(path).Length != 0)
-                {
-                    MessageBoxResult emptyDirectoryResult = Dialogs.YesNoCancelQuestion("Target directory is not empty. Delete directory contents before exporting?");
-                    if (emptyDirectoryResult == MessageBoxResult.Yes)
-                    {
-                        if (Directory.GetFiles(path, "*", SearchOption.AllDirectories).Any(f => Path.GetExtension(f).ToLower() != ".xml"))
-                        {
-                            Dialogs.Error("The directory contains files that aren't XML. I refuse to delete them!");
-                            return;
-                        }
-
-                        if (!Utility.TryEmptyDirectory(path))
-                        {
-                            Dialogs.Error("Error deleting directory contents!");
-                            return;
-                        }
-                    }
-                    else if (emptyDirectoryResult == MessageBoxResult.Cancel)
-                    {
-                        return;
-                    }
-                }
-
-                WaitWindow waitWindow = new WaitWindow("Exporting collection...");
-                waitWindow.ShowDialog(this, () =>
-                {
-                    using (CollectionManager exportManager = new Engine.CollectionManager(this.collectionSessionFactory))
-                    {
-                        using (DirectoryCollectionExporter exporter = new DirectoryCollectionExporter(folderDialog.SelectedPath, exportManager))
-                        {
-                            exporter.Export();
-                        }
-                    }
-                });
+                helper.Run();
             }
         }
 
         private void menuImportXml_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog();
-            folderDialog.ShowNewFolderButton = true;
-            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            using (DirectoryImportHelper helper = new DirectoryImportHelper(this, this.collectionSessionFactory))
             {
-                WaitWindow waitWindow = new WaitWindow("Importing collection...");
-                waitWindow.ShowDialog(this, () =>
-                {
-                    try
-                    {
-                        using (CollectionManager exportManager = new Engine.CollectionManager(this.collectionSessionFactory))
-                        {
-                            using (DirectoryCollectionImporter importer = new DirectoryCollectionImporter(folderDialog.SelectedPath, exportManager, UIHelper.UpdateReleaseThumbnail))
-                            {
-                                importer.Import();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Utility.WriteToErrorLog("Error importing: " + ex.ToString());
-                        MessageBox.Show("Error importing backup: " + ex.Message);
-                    }
-
-                    this.Dispatcher.BeginInvokeAction(() =>
-                    {
-                        CollectionManager.OnCollectionChanged();
-                    });
-                });
+                helper.Run();
             }
         }
 
         private void menuImportArchivedXml_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Zip Files (*.zip)|*.zip|" + Utility.AllFilesFilter;
-            if (openFileDialog.ShowDialog() == true)
+            using (ArchivedImportHelper helper = new ArchivedImportHelper(this, this.collectionSessionFactory))
             {
-                WaitWindow waitWindow = new WaitWindow("Importing collection...");
-                waitWindow.ShowDialog(this, () =>
-                {
-                    using (CollectionManager importManager = new Engine.CollectionManager(this.collectionSessionFactory))
-                    {
-                        try
-                        {
-                            using (CollectionImporterBase importer = new ArchivedCollectionImporter(openFileDialog.FileName, importManager, UIHelper.UpdateReleaseThumbnail))
-                            {
-                                importer.Import();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Utility.WriteToErrorLog("Error importing: " + ex.ToString());
-                            MessageBox.Show("Error importing backup: " + ex.Message);
-                        }
-                    }
-
-                    this.Dispatcher.BeginInvokeAction(() =>
-                    {
-                        CollectionManager.OnCollectionChanged();
-                    });
-                });
+                helper.Run();
             }
         }
 
         private void btnReplaceReleaseFiles_Click(object sender, RoutedEventArgs e)
         {
             object selectedItem = this.mainCollectionView.GetSelectedItem();
-            if (selectedItem is int)
+            if (selectedItem is string)
             {
-                int releaseId = (int)selectedItem;
+                string releaseId = (string)selectedItem;
                 ReplaceReleaseFilesWindow replaceReleaseFilesWindow = new ReplaceReleaseFilesWindow(this.collectionSessionFactory, releaseId);
                 replaceReleaseFilesWindow.ShowDialog(this);
             }
@@ -651,7 +491,7 @@ namespace MusicDatabase
         {
             this.collectionManager.Settings.ShowImagesInReleaseTree = menuBrowserShowImages.IsChecked;
             this.collectionManager.SaveSettings();
-            CollectionManager.OnCollectionChanged();
+            CollectionManagerGlobal.OnCollectionChanged();
         }
 
         private void menuBrowserViewMode_Click(object sender, RoutedEventArgs e)
@@ -661,7 +501,7 @@ namespace MusicDatabase
             Assert.IsTrue(Enum.TryParse((string)menuItem.Tag, out viewMode));
             this.collectionManager.Settings.ReleasesViewMode = viewMode;
             this.collectionManager.SaveSettings();
-            CollectionManager.OnCollectionChanged();
+            CollectionManagerGlobal.OnCollectionChanged();
         }
 
         private void btnUpdateReleasesDynamicProperties_Click(object sender, RoutedEventArgs e)
@@ -670,7 +510,7 @@ namespace MusicDatabase
             new WaitWindow("Update releases properties...").ShowDialog(this, new Task(() =>
             {
                 this.collectionManager.Operations.UpdateReleasesDynamicProperties(progress);
-                this.Dispatcher.BeginInvokeAction(() => CollectionManager.OnCollectionChanged());
+                this.Dispatcher.BeginInvokeAction(() => CollectionManagerGlobal.OnCollectionChanged());
             }), progress);
         }
 
@@ -679,8 +519,8 @@ namespace MusicDatabase
             Progress<double> progress = new Progress<double>();
             new WaitWindow("Update releases properties...").ShowDialog(this, new Task(() =>
             {
-                this.collectionManager.Operations.UpdateReleasesThumbnails(progress, r => UIHelper.UpdateReleaseThumbnail(r, this.collectionManager.ImageHandler));
-                this.Dispatcher.BeginInvokeAction(() => CollectionManager.OnCollectionChanged());
+                this.collectionManager.Operations.UpdateReleasesThumbnails(progress);
+                this.Dispatcher.BeginInvokeAction(() => CollectionManagerGlobal.OnCollectionChanged());
             }), progress);
         }
 
@@ -696,140 +536,65 @@ namespace MusicDatabase
             window.Show(this);
         }
 
-        private void btnRecalculateReplayGain_Click(object sender, RoutedEventArgs e)
+        private void btnRecalculateReplayGainAll_Click(object sender, RoutedEventArgs e)
         {
-            Dictionary<Release, ReplayGainTask> releaseToTask = new Dictionary<Release, ReplayGainTask>();
-            Dictionary<Track, FileEncodeTask> trackToTask = new Dictionary<Track, FileEncodeTask>();
-            List<IParallelTask> tasks = new List<IParallelTask>();
-
-            Progress<double> progress = new Progress<double>();
-            new WaitWindow("Generating tasks...").ShowDialog(this, new Task(() =>
+            using (ReplayGainUpdateHelper updater = new ReplayGainUpdateHelper(this, this.SettingsManager, this.collectionSessionFactory))
             {
-                this.GenerateReplayGainTasks(releaseToTask, trackToTask, tasks, progress);
-            }), progress);
-
-            EncoderController encoderController = new EncoderController(tasks.ToArray(), this.SettingsManager.Settings.ActualLocalConcurrencyLevel);
-
-            EncodingWindow encodingWindow = new EncodingWindow(encoderController);
-            if (encodingWindow.ShowDialog(this) == true)
-            {
-                using (var transaction = this.collectionManager.BeginTransaction())
-                {
-                    foreach (KeyValuePair<Release, ReplayGainTask> item in releaseToTask)
-                    {
-                        if (item.Value.AlbumGain != null)
-                        {
-                            item.Key.ReplayGainAlbumGain = item.Value.AlbumGain.GetGain();
-                            item.Key.ReplayGainAlbumPeak = item.Value.AlbumGain.GetPeak();
-                        }
-                    }
-
-                    foreach (KeyValuePair<Track, FileEncodeTask> item in trackToTask)
-                    {
-                        if (item.Value.TrackGain != null)
-                        {
-                            item.Key.ReplayGainTrackGain = item.Value.TrackGain.GetGain();
-                            item.Key.ReplayGainTrackPeak = item.Value.TrackGain.GetPeak();
-                        }
-                    }
-                }
+                updater.RunAllReleases();
             }
         }
 
-        private void GenerateReplayGainTasks(Dictionary<Release, ReplayGainTask> releaseToTask, Dictionary<Track, FileEncodeTask> trackToTask, List<IParallelTask> tasks, IProgress<double> progress)
+        private void btnRecalculateReplayGainThis_Click(object sender, RoutedEventArgs e)
         {
-            DspEncoderFactory replayGainFactory = new DspEncoderFactory(this.SettingsManager.Settings.LocalConcurrencyLevel, true, false);
-            using (CollectionManager innerManager = new CollectionManager(this.collectionSessionFactory))
+            object selectedItem = this.mainCollectionView.GetSelectedItem();
+            if (selectedItem is string)
             {
-                Release[] releases = innerManager.Releases.ToArray();
-                double progressCoef = 1.0 / releases.Length;
-                int processed = 0;
-                foreach (Release release in releases)
+                string releaseId = (string)selectedItem;
+                Release release = this.collectionManager.GetReleaseById(releaseId);
+
+                using (ReplayGainUpdateHelper updater = new ReplayGainUpdateHelper(this, this.SettingsManager, this.collectionSessionFactory))
                 {
-                    List<FileEncodeTask> releaseTasks = new List<FileEncodeTask>();
-
-                    foreach (Track track in release.Tracklist)
-                    {
-                        string filename = Path.Combine(innerManager.Settings.MusicDirectory, track.RelativeFilename);
-                        var task = new FileEncodeTask(replayGainFactory, () => AudioHelper.GetAudioSourceForFile(filename), filename, null);
-
-                        tasks.Add(task);
-                        releaseTasks.Add(task);
-                        trackToTask[track] = task;
-                    }
-
-                    ReplayGainTask rgTask = new ReplayGainTask(replayGainFactory, releaseTasks.ToArray(), true);
-                    tasks.Add(rgTask);
-                    releaseToTask[release] = rgTask;
-
-                    ++processed;
-                    progress.Report(processed * progressCoef);
-
+                    updater.RunOneRelease(release);
                 }
+            }
+            else
+            {
+                Dialogs.Inform("Please select a release.");
             }
         }
 
-        private void btnRecalculateDynamicRange_Click(object sender, RoutedEventArgs e)
+        private void btnRecalculateDynamicRangeAll_Click(object sender, RoutedEventArgs e)
         {
-            using (CollectionManager innerManager = new CollectionManager(this.collectionSessionFactory))
+            using (DynamicRangeUpdater updater = new DynamicRangeUpdater(this, this.SettingsManager, this.collectionSessionFactory))
             {
-                Dictionary<Track, FileEncodeTask> trackToTask = new Dictionary<Track, FileEncodeTask>();
-                List<FileEncodeTask> tasks = new List<FileEncodeTask>();
-
-                Progress<double> progress = new Progress<double>();
-                new WaitWindow("Generating tasks...").ShowDialog(this, new Task(() =>
-                {
-                    this.GenerateDynamicRangeTasks(innerManager, tasks, trackToTask, progress);
-                }), progress);
-
-                EncoderController encoderController = new EncoderController(tasks.ToArray(), this.SettingsManager.Settings.ActualLocalConcurrencyLevel);
-
-                EncodingWindow encodingWindow = new EncodingWindow(encoderController);
-                if (encodingWindow.ShowDialog(this) == true)
-                {
-                    using (ITransaction transaction = innerManager.BeginTransaction())
-                    {
-                        foreach (KeyValuePair<Track, FileEncodeTask> items in trackToTask)
-                        {
-                            if (items.Value.DrMeter != null)
-                            {
-                                items.Key.DynamicRange = items.Value.DrMeter.GetDynamicRange();
-                            }
-                        }
-
-                        foreach (Release release in innerManager.Releases)
-                        {
-                            release.UpdateDynamicProperties();
-                        }
-
-                        transaction.Commit();
-                    }
-
-                    CollectionManager.OnCollectionChanged();
-                }
+                updater.RunAllReleases();
             }
         }
 
-        private void GenerateDynamicRangeTasks(CollectionManager manager, List<FileEncodeTask> tasks, Dictionary<Track, FileEncodeTask> trackToTask, IProgress<double> progress)
+        private void btnRecalculateDynamicRangeThis_Click(object sender, RoutedEventArgs e)
         {
-            DspEncoderFactory replayGainFactory = new DspEncoderFactory(this.SettingsManager.Settings.LocalConcurrencyLevel, false, true);
-
-            Release[] releases = manager.Releases.ToArray();
-            double progressCoef = 1.0 / releases.Length;
-            int processed = 0;
-            foreach (Release release in releases)
+            object selectedItem = this.mainCollectionView.GetSelectedItem();
+            if (selectedItem is string)
             {
-                foreach (Track track in release.Tracklist)
+                string releaseId = (string)selectedItem;
+                Release release = this.collectionManager.GetReleaseById(releaseId);
+
+                using (DynamicRangeUpdater updater = new DynamicRangeUpdater(this, this.SettingsManager, this.collectionSessionFactory))
                 {
-                    string filename = Path.Combine(manager.Settings.MusicDirectory, track.RelativeFilename);
-                    var task = new FileEncodeTask(replayGainFactory, () => AudioHelper.GetAudioSourceForFile(filename), filename, null);
-
-                    trackToTask[track] = task;
-                    tasks.Add(task);
+                    updater.RunOneRelease(release);
                 }
+            }
+            else
+            {
+                Dialogs.Inform("Please select a release.");
+            }
+        }
 
-                ++processed;
-                progress.Report(processed * progressCoef);
+        private void btnFillMissingCoverArt_Click(object sender, RoutedEventArgs e)
+        {
+            using (MissingCoverArtFillHelper helper = new MissingCoverArtFillHelper(this, this.collectionSessionFactory))
+            {
+                helper.Run();
             }
         }
 

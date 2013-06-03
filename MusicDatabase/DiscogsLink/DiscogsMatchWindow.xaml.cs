@@ -102,14 +102,14 @@ namespace MusicDatabase.DiscogsLink
             }
         }
 
-        private CollectionManager collectionManager;
+        private ICollectionManager collectionManager;
         private Release release;
         private MatchItem[] matchItems;
         private int matchedItemsCount = 0;
 
         public bool FixNames { get; set; }
 
-        public DiscogsMatchWindow(CollectionManager manager, IEnumerable<Tuple<TrackEntity, string>> tracks, Release release)
+        public DiscogsMatchWindow(ICollectionManager manager, IEnumerable<Tuple<TrackEntity, string>> tracks, Release release)
         {
             this.collectionManager = manager;
             this.FixNames = true;

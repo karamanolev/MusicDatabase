@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:MusicDatabase"
         xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
-        Title="Statistics" Height="400" Width="500"
+        Title="Statistics" Height="500" Width="550"
         Loaded="MusicDatabaseWindow_Loaded" Closing="MusicDatabaseWindow_Closing">
     <Grid>
         <Grid.RowDefinitions>
@@ -15,7 +15,7 @@
             <ListView Margin="6" Name="listView">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Property Name" Width="200" DisplayMemberBinding="{Binding Name}" />
+                        <GridViewColumn Header="Property Name" Width="300" DisplayMemberBinding="{Binding Name}" />
                         <GridViewColumn Header="Property Value" Width="180" DisplayMemberBinding="{Binding Value}" />
                     </GridView>
                 </ListView.View>

@@ -8,74 +8,47 @@ using MusicDatabase.Engine;
 
 namespace MusicDatabase.Audio.Network
 {
-    public class RemoteMp3EncoderFactory : IEncoderFactory
+    public class RemoteMp3EncoderFactory : EncoderFactoryBase
     {
         private DiscoveryServerDescriptor[] servers;
         private int vbrQuality;
         private int localConcurrency;
-        private bool calculateDr;
 
-        public int ThreadCount
-        {
-            get { return this.localConcurrency + servers.Select(s => s.ThreadCount).Sum(); }
-        }
-
-        public RemoteMp3EncoderFactory(DiscoveryServerDescriptor[] servers, int vbrQuality, int localConcurrency, bool calculateDr)
+        public RemoteMp3EncoderFactory(DiscoveryServerDescriptor[] servers, int vbrQuality, int localConcurrency, bool calculateRg, bool calculateDr)
+            : base(calculateRg, calculateDr)
         {
             this.localConcurrency = localConcurrency;
-
             this.servers = servers;
             this.vbrQuality = vbrQuality;
-            this.calculateDr = calculateDr;
+            this.ThreadCount = this.localConcurrency + servers.Select(s => s.ThreadCount).Sum();
         }
 
-        public void TryDeleteResult(IParallelTask _task)
+        public override void TryDeleteResult(IParallelTask _task)
         {
             FileEncodeTask task = (FileEncodeTask)_task;
             Utility.TryDeleteFile(task.TargetFilename);
             Utility.TryDeleteEmptyFoldersToTheRoot(Path.GetDirectoryName(task.TargetFilename));
         }
 
-        public IEncoder CreateEncoder(int threadNumber, IParallelTask _task)
+        protected override IEncoder CreateEncoderInternal(int threadNumber, FileEncodeTask task, IAudioSource audioSource)
         {
-            FileEncodeTask task = (FileEncodeTask)_task;
-            IAudioSource audioSource = task.AudioSourceLazy();
-            task.TrackGain = DspHelper.CreateTrackGain(audioSource);
-            if (this.calculateDr)
+            if (threadNumber < this.localConcurrency)
             {
-                task.DrMeter = DspHelper.CreateDrMeter(audioSource);
+                return new LocalMp3Encoder(audioSource, task.TargetFilename, task.Tag, vbrQuality, task.TrackGain, task.DrMeter);
             }
 
-            if (audioSource == null)
-            {
-                throw new SkipEncodingItemException("Audio source is not supported.");
-            }
+            threadNumber -= Environment.ProcessorCount;
 
-            try
+            foreach (DiscoveryServerDescriptor server in this.servers)
             {
-                if (threadNumber < this.localConcurrency)
+                if (threadNumber < server.ThreadCount)
                 {
-                    return new LocalMp3Encoder(audioSource, task.TargetFilename, task.Tag, vbrQuality, task.TrackGain, task.DrMeter);
+                    return new RemoteMp3VbrEncoder(server.Address, audioSource, task.TargetFilename, task.Tag, this.vbrQuality, task.TrackGain, task.DrMeter);
                 }
-
-                threadNumber -= Environment.ProcessorCount;
-
-                foreach (DiscoveryServerDescriptor server in this.servers)
-                {
-                    if (threadNumber < server.ThreadCount)
-                    {
-                        return new RemoteMp3VbrEncoder(server.Address, audioSource, task.TargetFilename, task.Tag, this.vbrQuality, task.TrackGain, task.DrMeter);
-                    }
-                    threadNumber -= server.ThreadCount;
-                }
-
-                throw new ArgumentException("threadNumber is too large.");
+                threadNumber -= server.ThreadCount;
             }
-            catch
-            {
-                audioSource.Close();
-                throw;
-            }
+
+            throw new ArgumentException("threadNumber is too large.");
         }
     }
 }

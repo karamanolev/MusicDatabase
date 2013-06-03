@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <GroupBox Header="Checksum Computation Progress" Margin="6">
@@ -29,5 +30,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
+
+        <Button Grid.Row="2" Margin="6,0,6,6" Content="Clear Window" HorizontalAlignment="Right" Width="100" Click="btnClear_Click" />
     </Grid>
 </local:MusicDatabaseWindow>

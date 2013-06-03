@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using MusicDatabase.Audio;
 using CUETools.Codecs;
-using System.Collections.Concurrent;
+using MusicDatabase.Audio;
 using MusicDatabase.Engine;
 
 namespace MusicDatabase.Advanced
@@ -81,7 +82,7 @@ namespace MusicDatabase.Advanced
                 catch (Exception e)
                 {
                     Utility.WriteToErrorLog(e.ToString());
-                    Dialogs.Error("Error processing file: " + e.Message);
+                    Dialogs.Error("Error processing file " + item + ": " + e.Message);
                 }
             }
         }
@@ -97,7 +98,8 @@ namespace MusicDatabase.Advanced
             AudioChecksumCalculator calculator = new AudioChecksumCalculator(file);
             calculator.ProgressChanged +=
                 ProgressBarUpdater.CreateHandler(this.Dispatcher, this.progressChecksum, () => this.shouldCancel);
-            uint crc32 = calculator.GetCRC32();
+            calculator.ComputeHashes();
+            uint crc32 = calculator.CRC32;
             ++this.processedFiles;
 
             file.Close();
@@ -139,7 +141,18 @@ namespace MusicDatabase.Advanced
 
         public void AddItem(string file)
         {
-            if (AudioHelper.IsSupportedAudioSource(file))
+            if (Directory.Exists(file))
+            {
+                foreach (string innerItem in Directory.GetDirectories(file).OrderBy(d => d))
+                {
+                    this.AddItem(innerItem);
+                }
+                foreach (string innerItem in Directory.GetFiles(file).OrderBy(f => f))
+                {
+                    this.AddItem(innerItem);
+                }
+            }
+            else if (AudioHelper.IsSupportedAudioSource(file))
             {
                 ++this.totalFiles;
                 this.tasks.Add(file);
@@ -164,6 +177,11 @@ namespace MusicDatabase.Advanced
             this.shouldCancel = true;
             this.tasks.CompleteAdding();
             this.workerTask.Wait();
+        }
+
+        private void btnClear_Click(object sender, RoutedEventArgs e)
+        {
+            this.listChecksums.Items.Clear();
         }
     }
 }

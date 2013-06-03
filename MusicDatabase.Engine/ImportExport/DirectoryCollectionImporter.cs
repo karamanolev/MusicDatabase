@@ -10,8 +10,8 @@ namespace MusicDatabase.Engine.ImportExport
     {
         private string path;
 
-        public DirectoryCollectionImporter(string path, CollectionManager collectionManager, Action<Release, ICollectionImageHandler> updateThumbnailAction)
-            : base(collectionManager, updateThumbnailAction)
+        public DirectoryCollectionImporter(string path, ICollectionManager collectionManager)
+            : base(collectionManager)
         {
             this.path = path;
         }

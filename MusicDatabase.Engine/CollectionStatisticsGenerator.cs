@@ -7,9 +7,9 @@ namespace MusicDatabase.Engine
 {
     public class CollectionStatisticsGenerator
     {
-        private CollectionManager collectionManager;
+        private ICollectionManager collectionManager;
 
-        public CollectionStatisticsGenerator(CollectionManager collectionManager)
+        public CollectionStatisticsGenerator(ICollectionManager collectionManager)
         {
             this.collectionManager = collectionManager;
         }

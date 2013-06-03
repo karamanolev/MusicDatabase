@@ -49,6 +49,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ServiceHost\ServiceHost.Interface\ServiceHost.Interface.csproj">
+      <Project>{e642129b-9fcc-4a95-923d-cfc33dec933c}</Project>
+      <Name>ServiceHost.Interface</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MusicDatabase.Audio.Flac\MusicDatabase.Audio.Flac.csproj">
       <Project>{C7DFED9C-E36F-47A7-A894-CF4BFB24D864}</Project>
       <Name>MusicDatabase.Audio.Flac</Name>

@@ -1,7 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using CUETools.Codecs;
-using System.IO;
+using MusicDatabase.Engine;
 
 namespace MusicDatabase.Audio.Mp3
 {
@@ -152,7 +153,7 @@ namespace MusicDatabase.Audio.Mp3
         {
             if (pcm.BitsPerSample != 16 && pcm.BitsPerSample != 24)
             {
-                throw new ArgumentException("LAME only supports 16 bits/sample. 24 bits are supported through conversion.");
+                throw new UnsupportedBitsPerSampleException("LAME only supports 16 bits/sample. 24 bits are supported through conversion.");
             }
         }
 

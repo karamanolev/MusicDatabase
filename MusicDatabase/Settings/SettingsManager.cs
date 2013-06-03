@@ -2,68 +2,63 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using MongoDB.Bson;
 using MusicDatabase.Settings.Entities;
-using NHibernate;
-using NHibernate.Linq;
+using MongoDB.Bson.IO;
+using System.IO;
+using MongoDB.Bson.Serialization;
 
 namespace MusicDatabase.Settings
 {
     public class SettingsManager : IDisposable
     {
+        private string settingsFileLocation;
         private MusicDatabaseSettings settings;
-        private ISession session;
 
         public MusicDatabaseSettings Settings
         {
-            get
-            {
-                if (this.settings != null)
-                {
-                    return this.settings;
-                }
-
-                this.settings = this.session.Query<MusicDatabaseSettings>().FirstOrDefault();
-
-                if (this.settings != null)
-                {
-                    return this.settings;
-                }
-
-                return this.settings = MusicDatabaseSettings.CreateDefault();
-            }
+            get { return this.settings; }
         }
 
         public SettingsManager()
         {
-            this.session = SettingsSessionFactory.CreateSession();
+            this.settingsFileLocation = Path.Combine(Path.GetDirectoryName(typeof(SettingsManager).Assembly.Location), "Settings.json");
+            this.TryLoadData();
         }
 
-        public void Save()
+        private void TryLoadData()
         {
-            if (this.settings == null)
+            try
             {
-                return;
+                BsonReader reader = BsonReader.Create(File.ReadAllText(this.settingsFileLocation));
+                this.settings = BsonSerializer.Deserialize<MusicDatabaseSettings>(reader);
             }
-
-            using (var transaction = this.session.BeginTransaction())
+            catch
             {
-                this.session.SaveOrUpdate(this.settings);
-                transaction.Commit();
+                this.settings = MusicDatabaseSettings.CreateDefault();
+                this.Save();
             }
         }
 
         public void ClearCache()
         {
-            this.session.Clear();
+            if (this.settingsFileLocation == null)
+            {
+                return;
+            }
+
+            this.TryLoadData();
+        }
+
+        public void Save()
+        {
+            File.WriteAllText(this.settingsFileLocation, this.settings.ToJson());
         }
 
         public void Dispose()
         {
-            if (this.session == null)
-            {
-                this.session.Dispose();
-                this.session = null;
-            }
+            this.settings = null;
+            this.settingsFileLocation = null;
         }
 
         public void ManageWindowSettings(Window window)
@@ -84,10 +79,10 @@ namespace MusicDatabase.Settings
                 }
             };
 
-            window.Closing += window_Closing;
+            window.Closing += WindowClosing;
         }
 
-        private void window_Closing(object sender, CancelEventArgs e)
+        private void WindowClosing(object sender, CancelEventArgs e)
         {
             Window window = (Window)sender;
             string typeName = window.GetType().Name;
@@ -127,11 +122,7 @@ namespace MusicDatabase.Settings
                 closingSettings.State = WindowState.Normal;
             }
 
-            using (var transaction = this.session.BeginTransaction())
-            {
-                this.session.SaveOrUpdate(closingSettings);
-                transaction.Commit();
-            }
+            this.Save();
         }
 
         public static event EventHandler SettingsChanged;

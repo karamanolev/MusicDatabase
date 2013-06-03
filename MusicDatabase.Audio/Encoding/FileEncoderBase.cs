@@ -64,6 +64,11 @@ namespace MusicDatabase.Audio.Encoding
                 }
             }
 
+            if (this.drMeter != null)
+            {
+                this.drMeter.Finish();
+            }
+
             this.AudioDest.Close();
             this.AudioDest = null;
 

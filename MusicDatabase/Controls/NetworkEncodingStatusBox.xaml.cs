@@ -21,8 +21,8 @@ namespace MusicDatabase
         private DispatcherTimer timer;
         private DiscoveryServerDescriptor[] servers;
 
-        private CollectionManager collectionManager;
-        public CollectionManager CollectionManager
+        private ICollectionManager collectionManager;
+        public ICollectionManager CollectionManager
         {
             get
             {

@@ -1,31 +1,16 @@
-﻿using FluentNHibernate.Mapping;
-using System;
+﻿using System;
 
 namespace MusicDatabase.Engine.Entities
 {
     public class EncodingTarget
     {
-        public class EncodingTargetMap : ClassMap<EncodingTarget>
-        {
-            public EncodingTargetMap()
-            {
-                Id(x => x.Id);
-                Map(x => x.TargetDirectory);
-                Map(x => x.FileNamingPattern);
+        public string TargetDirectory { get; set; }
+        public string FileNamingPattern { get; set; }
 
-                Map(x => x.Type);
-                Component(x => x.Mp3Settings).ColumnPrefix("Mp3_");
-            }
-        }
+        public EncodingTargetType Type { get; set; }
+        public EncodingTargetMp3Settings Mp3Settings { get; set; }
 
-        public virtual int Id { get; protected set; }
-        public virtual string TargetDirectory { get; set; }
-        public virtual string FileNamingPattern { get; set; }
-
-        public virtual EncodingTargetType Type { get; set; }
-        public virtual EncodingTargetMp3Settings Mp3Settings { get; set; }
-
-        public virtual string Extension
+        public string Extension
         {
             get
             {

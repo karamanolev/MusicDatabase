@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using MusicDatabase.Engine;
 using MusicDatabase.Engine.Entities;
 using MusicDatabase.Engine.ImportExport;
+using MusicDatabase.Engine.Database;
 
 namespace MusicDatabase.Advanced
 {
@@ -25,8 +26,8 @@ namespace MusicDatabase.Advanced
 
         class ImportTester : CollectionImporterBase
         {
-            public ImportTester(CollectionManager collectionManager, Action<Release, ICollectionImageHandler> updateThumbnailAction)
-                : base(collectionManager, updateThumbnailAction)
+            public ImportTester(ICollectionManager collectionManager)
+                : base(collectionManager)
             {
             }
         }
@@ -43,20 +44,20 @@ namespace MusicDatabase.Advanced
 
         class ExportTester : CollectionExporterBase, IDisposable
         {
-            private CollectionManager memoryCollection;
-            private CollectionSessionFactory_SQLiteMemory factory;
+            private ICollectionManager memoryCollection;
+            private MemorySessionFactory factory;
 
             private ReleaseEqualityComparer releaseComparer;
             private ImportTester importTester;
 
-            public ExportTester(CollectionManager collectionManager)
+            public ExportTester(ICollectionManager collectionManager)
                 : base(collectionManager)
             {
-                this.factory = new CollectionSessionFactory_SQLiteMemory();
-                this.memoryCollection = new CollectionManager(this.factory);
+                this.factory = new MemorySessionFactory();
+                this.memoryCollection = this.factory.CreateCollectionManager();
 
                 this.releaseComparer = new ReleaseEqualityComparer(true);
-                this.importTester = new ImportTester(this.memoryCollection, UIHelper.UpdateReleaseThumbnail);
+                this.importTester = new ImportTester(this.memoryCollection);
             }
 
             protected override IEnumerable<Stream> GetEntryOutputStream(string entryName, DateTime dateModified, object obj)

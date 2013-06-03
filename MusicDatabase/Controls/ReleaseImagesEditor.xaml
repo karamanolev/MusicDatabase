@@ -9,14 +9,6 @@
              d:DesignHeight="300" d:DesignWidth="300"
              AllowDrop="True" DragEnter="UserControl_DragEnter" Drop="UserControl_Drop">
     <Grid>
-        <Grid.Resources>
-            <ResourceDictionary>
-                <ResourceDictionary.MergedDictionaries>
-                    <ResourceDictionary Source="TileViewCustomStyle.xaml" />
-                </ResourceDictionary.MergedDictionaries>
-            </ResourceDictionary>
-        </Grid.Resources>
-        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -29,7 +21,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            
+
             <Button HorizontalAlignment="Left" VerticalAlignment="Center" Content="Studio" Width="80" Click="btnStudio_Click" />
 
             <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,2,0" Text="Add Image: " />
@@ -38,64 +30,83 @@
                       Name="comboAddItem" SelectionChanged="comboAddItem_SelectionChanged" />
         </Grid>
 
-        <telerik:RadTileView Grid.Row="1" Name="tileView" ItemsSource="{Binding Images}" ColumnWidth="{Binding ImageBoxWidth}" RowHeight="{Binding ImageBoxHeight}"
-                             IsAutoScrollingEnabled="True" PreservePositionWhenMaximized="True"
-                             MinimizedColumnWidth="150" MinimizedRowHeight="160" ScrollViewer.VerticalScrollBarVisibility="Visible"
-                             HeaderStyle="{StaticResource TileViewCustomHeader}"
-                             TilesPositionChanged="tileView_TilesPositionChanged">
-            <telerik:RadTileView.ItemTemplate>
-                <DataTemplate>
-                    <Grid HorizontalAlignment="Stretch">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="10" />
-                        </Grid.ColumnDefinitions>
+        <ListView Grid.Row="1" Name="listView" ItemsSource="{Binding Images}" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Style.Resources>
+                        <!-- Foreground for Selected ListViewItem -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
+                                 Color="Black"/>
+                        <!-- Background for Selected ListViewItem -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                 Color="#ddd"/>
+                    </Style.Resources>
+                </Style>
+            </ListView.ItemContainerStyle>
 
-                        <TextBlock Grid.Column="0" Text="{Binding HeaderText}" />
-
-                        <local:ImageButton Grid.Column="2" Image="{local:Icon Disk_20}" HoverImage="{local:Icon Disk_Glow_20}" Margin="0,0,2,0" Click="btnSave_Click" />
-                        <local:ImageButton Grid.Column="3" Image="{local:Icon Cross_16}" HoverImage="{local:Icon Cross_Glow_16}" Visibility="{Binding EditorVisibility}"
-                                           Click="btnDelete_Click"/>
-                    </Grid>
-                </DataTemplate>
-            </telerik:RadTileView.ItemTemplate>
-            <telerik:RadTileView.ContentTemplate>
+            <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        
-                        <local:ImageBox ImageBytes="{Binding Data}" />
-                        
-                        <Grid Grid.Column="1" Width="100" Visibility="{Binding Path=EditorVisibility}">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            
-                            <TextBlock Grid.Row="0" Margin="2,1">Type:</TextBlock>
-                            <ComboBox Grid.Row="1" Margin="2,1,0,1" Name="comboType"
+                    <Grid Margin="2,4,4,3" SnapsToDevicePixels="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border Background="#666" CornerRadius="3,3,0,0">
+                            <Grid HorizontalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="10" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Foreground="White" Grid.Column="0" Text="{Binding HeaderText}" VerticalAlignment="Center" Margin="6" />
+
+                                <local:ImageButton Grid.Column="2" Image="{local:Icon Disk_20}" HoverImage="{local:Icon Disk_Glow_20}" Margin="0,0,2,0" Click="btnSave_Click"
+                                                   VerticalAlignment="Center"/>
+                                <local:ImageButton Grid.Column="3" Image="{local:Icon Cross_16}" HoverImage="{local:Icon Cross_Glow_16}" Visibility="{Binding EditorVisibility}" 
+                                                   Click="btnDelete_Click" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" BorderBrush="#666" BorderThickness="1" CornerRadius="0,0,3,3" Padding="4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <local:ImageBox ImageBytes="{Binding Data}" />
+
+                                <Grid Grid.Column="1" Width="120" Visibility="{Binding Path=EditorVisibility}" Margin="4,0,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Margin="0,-1,0,1">Type:</TextBlock>
+                                    <ComboBox Grid.Row="1" Margin="0,1,0,1" Name="comboType"
                                       ItemsSource="{Binding ImageTypeComboItems}"
                                       SelectedItem="{Binding Type, Mode=TwoWay}" />
 
-                            <TextBlock Grid.Row="2" Margin="2,1">Description:</TextBlock>
-                            <TextBox Grid.Row="3" Margin="2,1,0,1" TextWrapping="Wrap" Height="50" IsReadOnly="{Binding IsReadOnly}"
+                                    <TextBlock Grid.Row="2" Margin="0,1">Description:</TextBlock>
+                                    <TextBox Grid.Row="3" Margin="0,1,0,1" TextWrapping="Wrap" MinHeight="50" IsReadOnly="{Binding IsReadOnly}"
                                      Text="{Binding Image.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" />
 
-                            <RadioButton Grid.Row="4" Margin="2,1" Name="radioIsDefault" Content="Default Image"
+                                    <RadioButton Grid.Row="4" Margin="0,1" Name="radioIsDefault" Content="Default Image"
                                          GroupName="ReleaseImageDefault" IsChecked="{Binding IsMain, Mode=TwoWay}" />
-                        </Grid>
+                                </Grid>
+                            </Grid>
+                        </Border>
                     </Grid>
                 </DataTemplate>
-            </telerik:RadTileView.ContentTemplate>
-        </telerik:RadTileView>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </UserControl>

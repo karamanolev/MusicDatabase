@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace MusicDatabase
 {
-    static class LibraryLoader
+    public static class LibraryLoader
     {
         [DllImport("kernel32", CharSet = CharSet.Auto)]
         private static extern bool SetDllDirectory(string fileName);

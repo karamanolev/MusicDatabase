@@ -10,7 +10,7 @@ namespace MusicDatabase.Engine.ImportExport
     {
         private ZipOutputStream zipOutputStream;
 
-        public ArchivedCollectionExporter(string outputPath, CollectionManager collectionManager)
+        public ArchivedCollectionExporter(string outputPath, ICollectionManager collectionManager)
             : base(collectionManager)
         {
             this.zipOutputStream = new ZipOutputStream(File.Create(outputPath));

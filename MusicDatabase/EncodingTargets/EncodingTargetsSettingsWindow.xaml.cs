@@ -73,6 +73,8 @@ namespace MusicDatabase.EncodingTargets
         private void OKCancelBox_OKClicked(object sender, EventArgs e)
         {
             this.CollectionManager.SaveSettings();
+            CollectionManagerGlobal.OnCollectionChanged();
+
             this.DialogResult = true;
         }
 
@@ -81,8 +83,8 @@ namespace MusicDatabase.EncodingTargets
             int index = this.listViewTargets.SelectedIndex;
             if (index != -1)
             {
-                this.CollectionManager.Delete(this.items[index].EncodingTarget);
                 this.CollectionManager.Settings.EncodingTargets.RemoveAt(index);
+                this.CollectionManager.SaveSettings();
 
                 this.items.RemoveAt(index);
             }

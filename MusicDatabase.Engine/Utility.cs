@@ -4,8 +4,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Xml;
+using MongoDB.Bson;
 using MusicDatabase.Engine.Entities;
 
 namespace MusicDatabase.Engine
@@ -167,7 +170,10 @@ namespace MusicDatabase.Engine
         {
             try
             {
-                File.Delete(fileName);
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
                 return true;
             }
             catch
@@ -180,7 +186,10 @@ namespace MusicDatabase.Engine
         {
             try
             {
-                Directory.Delete(directoryName, true);
+                if (Directory.Exists(directoryName))
+                {
+                    Directory.Delete(directoryName, true);
+                }
                 return true;
             }
             catch
@@ -252,6 +261,51 @@ namespace MusicDatabase.Engine
             return value;
         }
 
+        public static int GetAttributeInt32(this XmlReader reader, string attributeName, int defaultValue)
+        {
+            string value = reader.GetAttributeOrNull(attributeName);
+            if (value == null)
+            {
+                return defaultValue;
+            }
+            int intValue;
+            if (int.TryParse(value, out intValue))
+            {
+                return intValue;
+            }
+            return defaultValue;
+        }
+
+        public static double GetAttributeDouble(this XmlReader reader, string attributeName, double defaultValue)
+        {
+            string value = reader.GetAttributeOrNull(attributeName);
+            if (value == null)
+            {
+                return defaultValue;
+            }
+            double intValue;
+            if (double.TryParse(value, out intValue))
+            {
+                return intValue;
+            }
+            return defaultValue;
+        }
+
+        public static long GetAttributeInt64(this XmlReader reader, string attributeName, long defaultValue)
+        {
+            string value = reader.GetAttributeOrNull(attributeName);
+            if (value == null)
+            {
+                return defaultValue;
+            }
+            long intValue;
+            if (long.TryParse(value, out intValue))
+            {
+                return intValue;
+            }
+            return defaultValue;
+        }
+
         public static T ParseEnum<T>(string value)
         {
             return (T)Enum.Parse(typeof(T), value);
@@ -313,6 +367,39 @@ namespace MusicDatabase.Engine
         public static double Clamp(double value, double min, double max)
         {
             return Math.Min(max, Math.Max(min, value));
+        }
+
+        public static string ComputeSHA1(byte[] data)
+        {
+            using (SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider())
+            {
+                return Convert.ToBase64String(sha1.ComputeHash(data));
+            }
+        }
+
+        public static bool EqualsThreshold(this double value, double other, double epsilon = 0.00001)
+        {
+            return Math.Abs(value - other) <= epsilon;
+        }
+
+        public static TagLib.File TryCreateTagLibFile(string path, int retries = 3, int intervalMillis = 500)
+        {
+            Exception exception = null;
+
+            for (int i = 0; i < retries; ++i)
+            {
+                try
+                {
+                    return TagLib.File.Create(path);
+                }
+                catch(Exception ex)
+                {
+                    exception = ex;
+                    Thread.Sleep(intervalMillis);
+                }
+            }
+
+            throw exception;
         }
     }
 }

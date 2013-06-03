@@ -15,10 +15,6 @@ namespace MusicDatabase
         {
             InitializeComponent();
 
-            if (this.CollectionManager.Settings == null)
-            {
-                this.CollectionManager.Settings = CollectionSettings.CreateDefault();
-            }
             this.PopulateUI(this.CollectionManager.Settings);
         }
 

@@ -100,7 +100,7 @@ namespace MusicDatabase.Engine.Tagging
 
         public void WriteToFile(string filename)
         {
-            using (TagLib.File file = TagLib.File.Create(filename))
+            using (TagLib.File file = Utility.TryCreateTagLibFile(filename))
             {
                 file.Tag.AlbumArtists = new string[] { this.AlbumArtists };
                 file.Tag.Performers = new string[] { this.Artists };
@@ -135,7 +135,8 @@ namespace MusicDatabase.Engine.Tagging
             {
                 fileInfo = new FileInfo(filename);
             }
-            using (TagLib.File file = TagLib.File.Create(filename))
+
+            using (TagLib.File file = Utility.TryCreateTagLibFile(filename))
             {
                 file.Tag.ReplayGainTrackGain = trackGain;
                 file.Tag.ReplayGainTrackPeak = trackPeak;
@@ -143,6 +144,7 @@ namespace MusicDatabase.Engine.Tagging
                 file.Tag.ReplayGainAlbumPeak = albumPeak;
                 file.Save();
             }
+
             if (keepFileTimes)
             {
                 File.SetCreationTime(filename, fileInfo.CreationTime);

@@ -1,20 +1,13 @@
-﻿using System;
-using FluentNHibernate.Mapping;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System;
 
 namespace MusicDatabase.Engine.Entities
 {
     public class ReleaseDate
     {
-        public class ReleaseDateMap : ComponentMap<ReleaseDate>
-        {
-            public ReleaseDateMap()
-            {
-                Map(x => x.Type);
-                Map(x => x.Date);
-            }
-        }
-
         public ReleaseDateType Type { get; set; }
+
+        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
         public DateTime Date { get; set; }
 
         public bool IsValid

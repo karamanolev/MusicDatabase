@@ -38,28 +38,23 @@
     <Reference Include="CsQuery">
       <HintPath>..\packages\CsQuery.1.2.1\lib\net40\CsQuery.dll</HintPath>
     </Reference>
-    <Reference Include="FluentNHibernate, Version=1.3.0.733, Culture=neutral, PublicKeyToken=8aa435e3cb308880, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\FluentNHibernate.1.3.0.733\lib\FluentNHibernate.dll</HintPath>
-    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\Libraries\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="Iesi.Collections, Version=1.0.1.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Iesi.Collections.3.3.1.4000\lib\Net35\Iesi.Collections.dll</HintPath>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\Libraries\MongoDB.Bson.dll</HintPath>
     </Reference>
-    <Reference Include="NHibernate, Version=3.3.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NHibernate.3.3.1.4000\lib\Net35\NHibernate.dll</HintPath>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\Libraries\MongoDB.Driver.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite, Version=1.0.82.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\System.Data.SQLite.1.0.82.0\lib\net40\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\packages\System.Data.SQLite.1.0.84.0\lib\net45\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.SQLite.Linq">
-      <HintPath>..\packages\System.Data.SQLite.1.0.82.0\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
+      <HintPath>..\packages\System.Data.SQLite.1.0.84.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -75,12 +70,21 @@
     <Compile Include="AssertFailedException.cs" />
     <Compile Include="CallbackEqualityComparer.cs" />
     <Compile Include="CollectionFactoryFactory.cs" />
-    <Compile Include="CollectionSessionFactory_MySQL.cs" />
-    <Compile Include="CollectionSessionFactory_SQLiteMemory.cs" />
+    <Compile Include="CollectionManagerBase.cs" />
     <Compile Include="CompareObjects.cs" />
+    <Compile Include="Database\Extensions.cs" />
+    <Compile Include="Database\MongoDB\GridFSImageHandler.cs" />
+    <Compile Include="Database\MemoryCollectionManager.cs" />
+    <Compile Include="Database\MemorySessionFactory.cs" />
+    <Compile Include="Database\MongoDB\MongoSessionFactory.cs" />
+    <Compile Include="Database\SQLite\SQLiteCollectionManager.cs" />
+    <Compile Include="Database\SQLite\SQLiteExtensions.cs" />
+    <Compile Include="Database\SQLite\SQLiteImageHandler.cs" />
+    <Compile Include="Database\SQLite\SQLiteSessionFactory.cs" />
+    <Compile Include="Database\SQLite\SQLiteTransaction.cs" />
     <Compile Include="DrMeter.cs" />
-    <Compile Include="FileImageHandler.cs" />
     <Compile Include="ICollectionImageHandler.cs" />
+    <Compile Include="ICollectionManager.cs" />
     <Compile Include="ICollectionSessionFactory.cs" />
     <Compile Include="ImportExport\ArchivedCollectionExporter.cs" />
     <Compile Include="ImportExport\ArchivedCollectionImporter.cs" />
@@ -111,22 +115,23 @@
     </Compile>
     <Compile Include="ImportExport\DirectoryCollectionExporter.cs" />
     <Compile Include="ImportExport\DirectoryCollectionImporter.cs" />
+    <Compile Include="ImportExport\Keys.cs" />
     <Compile Include="ImportExport\XmlReleaseImporter.cs" />
+    <Compile Include="ITransaction.cs" />
+    <Compile Include="ITransactionalCollectionManager.cs" />
     <Compile Include="M3UGenerator.cs" />
-    <Compile Include="MemoryImageHandler.cs" />
+    <Compile Include="Database\MemoryImageHandler.cs" />
     <Compile Include="MimeHelper.cs" />
     <Compile Include="ReleaseEqualityComparer.cs" />
     <Compile Include="ReleaseScorer.cs" />
     <Compile Include="Tagging\AudioFileImage.cs" />
-    <Compile Include="CollectionManager.cs" />
+    <Compile Include="Database\MongoDB\MongoCollectionManager.cs" />
     <Compile Include="CollectionManagerOperations.cs" />
     <Compile Include="Entities\Artist.cs" />
     <Compile Include="Entities\CollectionSettings.cs" />
     <Compile Include="Entities\Release.cs" />
     <Compile Include="Entities\ReleaseArtist.cs" />
     <Compile Include="Entities\Track.cs" />
-    <Compile Include="CollectionSessionFactory_SQLite.cs" />
-    <Compile Include="Fluent\FluentHelper.cs" />
     <Compile Include="Local\LocalAlbum.cs" />
     <Compile Include="Local\LocalAlbumArtist.cs" />
     <Compile Include="Local\LocalCollection.cs" />
@@ -141,12 +146,21 @@
     <Compile Include="Tagging\AudioFileTag.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ThumbnailGenerator.cs" />
+    <Compile Include="UnsupportedBitsPerSampleException.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="WikipediaAlbumParseResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\NImageMagick\NImageMagick\NImageMagick.csproj">
+      <Project>{c56442fb-a4a4-4ad0-bef2-dea9b1be6404}</Project>
+      <Name>NImageMagick</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

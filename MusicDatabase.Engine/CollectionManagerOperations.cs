@@ -1,18 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using MusicDatabase.Engine.Entities;
 using MusicDatabase.Engine.Local;
-using NHibernate;
-using System;
-using System.Text;
+using System.IO;
+using MusicDatabase.Engine.Tagging;
 
 namespace MusicDatabase.Engine
 {
     public class CollectionManagerOperations
     {
-        private CollectionManager collectionManager;
+        private ICollectionManager collectionManager;
 
-        public CollectionManagerOperations(CollectionManager collectionManager)
+        public CollectionManagerOperations(ICollectionManager collectionManager)
         {
             this.collectionManager = collectionManager;
         }
@@ -131,7 +132,7 @@ namespace MusicDatabase.Engine
             return true;
         }
 
-        public List<Track> GenerateTracklistForLocalAlbum(CollectionManager collectionManager, LocalAlbum album, Release release)
+        public List<Track> GenerateTracklistForLocalAlbum(ICollectionManager collectionManager, LocalAlbum album, Release release)
         {
             List<Track> list = new List<Track>();
             foreach (LocalDisc disc in album.Discs)
@@ -169,39 +170,40 @@ namespace MusicDatabase.Engine
             int dateModified = 0;
             int dateAudioModified = 0;
 
-            using (ITransaction transaction = this.collectionManager.BeginTransaction())
+            //using (ITransaction transaction = this.collectionManager.BeginTransaction())
+            //{
+            foreach (Release release in this.collectionManager.Releases)
             {
-                foreach (Release release in this.collectionManager.Releases)
+                if (release.OriginalReleaseDate == null)
                 {
-                    if (release.OriginalReleaseDate == null)
-                    {
-                        release.OriginalReleaseDate = new ReleaseDate();
-                        ++originalReleaseDate;
-                    }
-
-                    if (release.DateAdded == DateTime.MinValue)
-                    {
-                        release.DateAdded = DateTime.Now;
-                        ++dateAdded;
-                    }
-
-                    if (release.DateModified == DateTime.MinValue)
-                    {
-                        release.DateModified = DateTime.Now;
-                        ++dateModified;
-                    }
-
-                    if (release.DateAudioModified == DateTime.MinValue)
-                    {
-                        release.DateAudioModified = release.DateModified;
-                        ++dateAudioModified;
-                    }
+                    release.OriginalReleaseDate = new ReleaseDate();
+                    ++originalReleaseDate;
                 }
 
-                transaction.Commit();
-            }
+                if (release.DateAdded == DateTime.MinValue)
+                {
+                    release.DateAdded = DateTime.Now;
+                    ++dateAdded;
+                }
 
-            CollectionManager.OnCollectionChanged();
+                if (release.DateModified == DateTime.MinValue)
+                {
+                    release.DateModified = DateTime.Now;
+                    ++dateModified;
+                }
+
+                if (release.DateAudioModified == DateTime.MinValue)
+                {
+                    release.DateAudioModified = release.DateModified;
+                    ++dateAudioModified;
+                }
+
+                this.collectionManager.Save(release);
+            }
+            //transaction.Commit();
+            //}
+
+            CollectionManagerGlobal.OnCollectionChanged();
 
             StringBuilder sb = new StringBuilder();
             if (originalReleaseDate != 0)
@@ -228,35 +230,109 @@ namespace MusicDatabase.Engine
         {
             int count = this.collectionManager.Releases.Count();
             int processed = 0;
-            using (var transaction = this.collectionManager.BeginTransaction())
+            //using (var transaction = this.collectionManager.BeginTransaction())
+            //{
+            foreach (Release release in this.collectionManager.Releases)
             {
-                foreach (Release release in this.collectionManager.Releases)
-                {
-                    release.UpdateDynamicProperties();
-                    this.collectionManager.SaveOrUpdate(release);
+                release.UpdateDynamicProperties();
+                this.collectionManager.Save(release);
 
-                    ++processed;
-                    progress.Report((double)processed / count);
-                }
-                transaction.Commit();
+                ++processed;
+                progress.Report((double)processed / count);
             }
+            //transaction.Commit();
+            //}
         }
 
-        public void UpdateReleasesThumbnails(IProgress<double> progress, Action<Release> updateThumbnailAction)
+        public void UpdateReleasesThumbnails(IProgress<double> progress)
         {
             int count = this.collectionManager.Releases.Count();
             int processed = 0;
-            using (var transaction = this.collectionManager.BeginTransaction())
+            //using (var transaction = this.collectionManager.BeginTransaction())
+            //{
+            foreach (Release release in this.collectionManager.Releases)
             {
-                foreach (Release release in this.collectionManager.Releases)
-                {
-                    updateThumbnailAction(release);
-                    this.collectionManager.SaveOrUpdate(release);
+                ThumbnailGenerator.UpdateReleaseThumbnail(release, this.collectionManager.ImageHandler);
+                this.collectionManager.Save(release);
 
-                    ++processed;
-                    progress.Report((double)processed / count);
+                ++processed;
+                progress.Report((double)processed / count);
+            }
+            //transaction.Commit();
+            //}
+        }
+
+
+        public void MoveTracks(Release release, Func<string, Exception, bool> exceptionHandler)
+        {
+            string musicDirectory = this.collectionManager.Settings.MusicDirectory;
+            string namingPattern = this.collectionManager.Settings.FileNamingPattern;
+
+            foreach (Track track in release.Tracklist)
+            {
+                if (track.RelativeFilename.EndsWith(".mp3"))
+                {
+                    continue;
                 }
-                transaction.Commit();
+
+                if (!track.RelativeFilename.EndsWith(".flac"))
+                {
+                    throw new Exception("Track must end with .flac");
+                }
+
+                string oldFilename = Path.Combine(musicDirectory, track.RelativeFilename);
+                string newRelativeName = FilenameGenerator.PatternToFilename(
+                    namingPattern, release, track) + ".flac";
+                string newFilename = Path.Combine(musicDirectory, newRelativeName);
+
+                if (oldFilename == newFilename)
+                {
+                    continue;
+                }
+
+                while (true)
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(newFilename));
+                        File.Move(oldFilename, newFilename);
+                        Utility.TryDeleteEmptyFoldersToTheRoot(Path.GetDirectoryName(oldFilename));
+                        break;
+                    }
+                    catch (Exception moveException)
+                    {
+                        if (exceptionHandler(oldFilename, moveException))
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                track.RelativeFilename = newRelativeName;
+            }
+
+            this.collectionManager.Save(release);
+        }
+
+        public void WriteTags(Release release, IProgress<double> progress = null)
+        {
+            string musicDirectory = this.collectionManager.Settings.MusicDirectory;
+
+            int tracksFinished = 0;
+            foreach (Track track in release.Tracklist)
+            {
+                AudioFileTag tag = new AudioFileTag(release, track);
+                string filename = Path.Combine(musicDirectory, track.RelativeFilename);
+                tag.WriteToFile(filename);
+
+                File.SetLastWriteTime(filename, release.DateModified);
+
+                ++tracksFinished;
+
+                if (progress != null)
+                {
+                    progress.Report((double)tracksFinished / release.Tracklist.Count);
+                }
             }
         }
     }

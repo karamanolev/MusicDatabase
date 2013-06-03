@@ -1,12 +1,16 @@
 ﻿using System;
 using CUETools.Codecs;
 using MusicDatabase.Engine;
+using System.Security.Cryptography;
 
 namespace MusicDatabase.Audio
 {
     public class AudioChecksumCalculator
     {
         private IAudioSource audioSource;
+
+        public uint CRC32 { get; private set; }
+        public byte[] SHA1 { get; private set; }
 
         public AudioChecksumCalculator(string file)
         {
@@ -18,11 +22,13 @@ namespace MusicDatabase.Audio
             this.audioSource = source;
         }
 
-        public uint GetCRC32()
+        public void ComputeHashes()
         {
             try
             {
-                uint checksum = 0;
+                SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider();
+
+                this.CRC32 = 0;
 
                 long totalSamples = this.audioSource.Length;
                 long processedSamples = 0;
@@ -30,7 +36,16 @@ namespace MusicDatabase.Audio
                 AudioBuffer buffer = new AudioBuffer(this.audioSource.PCM, 44100);
                 while (this.audioSource.Read(buffer, 44100) > 0)
                 {
-                    checksum = Crc32.ComputeChecksum(checksum, buffer.Bytes, 0, buffer.ByteLength);
+                    byte[] bufferBytes = buffer.Bytes;
+                    if (this.audioSource.Position == this.audioSource.Length)
+                    {
+                        sha1.TransformFinalBlock(bufferBytes, 0, buffer.ByteLength);
+                    }
+                    else
+                    {
+                        sha1.TransformBlock(bufferBytes, 0, buffer.ByteLength, null, 0);
+                    }
+                    this.CRC32 = Crc32.ComputeChecksum(this.CRC32, buffer.Bytes, 0, buffer.ByteLength);
 
                     processedSamples += buffer.Length;
 
@@ -38,11 +53,11 @@ namespace MusicDatabase.Audio
                     this.OnProgressChanged(eventArgs);
                     if (eventArgs.Cancel)
                     {
-                        return 0;
+                        return;
                     }
                 }
 
-                return checksum;
+                this.SHA1 = sha1.Hash;
             }
             finally
             {

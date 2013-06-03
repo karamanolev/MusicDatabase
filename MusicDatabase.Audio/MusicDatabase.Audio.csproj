@@ -71,6 +71,7 @@
     <Compile Include="Encoding\CueToolsFlacEncoderFactory.cs" />
     <Compile Include="Encoding\EncoderControllerStatus.cs" />
     <Compile Include="Encoding\EncoderController.cs" />
+    <Compile Include="Encoding\EncoderFactoryBase.cs" />
     <Compile Include="Encoding\FileEncodeTask.cs" />
     <Compile Include="Encoding\EncodeTaskStatus.cs" />
     <Compile Include="Encoding\FileEncoderBase.cs" />

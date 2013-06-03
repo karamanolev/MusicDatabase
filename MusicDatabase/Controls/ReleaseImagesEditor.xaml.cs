@@ -12,6 +12,7 @@ using MusicDatabase.Engine.Entities;
 using MusicDatabase.ImageStudio;
 using Telerik.Windows.Controls;
 using Image = MusicDatabase.Engine.Entities.Image;
+using WPF.JoshSmith.ServiceProviders.UI;
 
 namespace MusicDatabase
 {
@@ -104,9 +105,10 @@ namespace MusicDatabase
 
         private Image[] originalReleaseImages;
         private Release release;
+        private ListViewDragDropManager<ImageInfo> dragDropManager;
 
         public ObservableCollection<ImageInfo> Images { get; set; }
-        public CollectionManager CollectionManager { get; set; }
+        public ICollectionManager CollectionManager { get; set; }
 
         public Release Release
         {
@@ -141,6 +143,37 @@ namespace MusicDatabase
             }
         }
 
+        public IEnumerable<ImageInfo> TestImageInfos
+        {
+            get
+            {
+                yield return new ImageInfo()
+                {
+                    Image = new Image()
+                    {
+                        Description = "desc",
+                        Extension = ".png",
+                        IsMain = true,
+                        MimeType = "image/png",
+                        Type = ImageType.FrontCover
+                    },
+                    Data = File.ReadAllBytes(@"D:\temp\tempphoto\2011-09-25 17.05.58.jpg")
+                };
+                yield return new ImageInfo()
+                {
+                    Image = new Image()
+                    {
+                        Description = "2nd image",
+                        Extension = ".jpeg",
+                        IsMain = false,
+                        MimeType = "image/jpeg",
+                        Type = ImageType.BackCover
+                    },
+                    Data = File.ReadAllBytes(@"D:\temp\tempphoto\2011-12-16 01.03.34.jpg")
+                };
+            }
+        }
+
         public bool IsReadOnly
         {
             get { return (bool)GetValue(IsReadOnlyProperty); }
@@ -152,26 +185,13 @@ namespace MusicDatabase
         {
             ReleaseImagesEditor editor = (ReleaseImagesEditor)sender;
             editor.gridAddImage.Visibility = editor.IsReadOnly ? Visibility.Collapsed : Visibility.Visible;
-            editor.tileView.IsItemDraggingEnabled = !editor.IsReadOnly;
+            editor.dragDropManager.ListView = editor.IsReadOnly ? null : editor.listView;
 
             foreach (ImageInfo i in editor.Images)
             {
                 i.EditorVisibility = editor.IsReadOnly ? Visibility.Collapsed : Visibility.Visible;
                 i.IsReadOnly = editor.IsReadOnly;
             }
-        }
-
-        public bool IsMaximizationEnabled
-        {
-            get { return (bool)GetValue(IsMaximizationEnabledProperty); }
-            set { SetValue(IsMaximizationEnabledProperty, value); }
-        }
-        public static readonly DependencyProperty IsMaximizationEnabledProperty =
-            DependencyProperty.Register("IsMaximizationEnabled", typeof(bool), typeof(ReleaseImagesEditor), new PropertyMetadata(true, OnIsMaximizationEnabledPropertyChangedCallback));
-        private static void OnIsMaximizationEnabledPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            ReleaseImagesEditor editor = (ReleaseImagesEditor)sender;
-            editor.tileView.MaximizeMode = editor.IsMaximizationEnabled ? TileViewMaximizeMode.ZeroOrOne : TileViewMaximizeMode.Zero;
         }
 
         public double ImageBoxWidth
@@ -196,6 +216,9 @@ namespace MusicDatabase
             this.DataContext = this;
 
             InitializeComponent();
+
+            this.dragDropManager = new ListViewDragDropManager<ImageInfo>(this.listView);
+            this.dragDropManager.ProcessDrop += dragDropManager_ProcessDrop;
         }
 
         private void OnReleaseChanged()
@@ -242,7 +265,7 @@ namespace MusicDatabase
                 IsReadOnly = this.IsReadOnly
             });
 
-            //this.scrollViewer.ScrollToBottom();
+            this.listView.ScrollIntoView(this.Images.Last());
 
             return true;
         }
@@ -355,18 +378,18 @@ namespace MusicDatabase
             }
         }
 
-        private void tileView_TilesPositionChanged(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        private void dragDropManager_ProcessDrop(object sender, ProcessDropEventArgs<ReleaseImagesEditor.ImageInfo> e)
         {
             this.release.Images.Clear();
-            this.release.Images.AddRange(this.Images.OrderBy(i => ((RadTileViewItem)this.tileView.ItemContainerGenerator.ContainerFromItem(i)).Position).Select(i => i.Image));
+            this.release.Images.AddRange(this.Images.Select(i => i.Image));
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (Dialogs.Confirm())
             {
-                RadTileViewItem tile = ((FrameworkElement)sender).ParentOfType<RadTileViewItem>();
-                ImageInfo imageInfo = (ImageInfo)this.tileView.ItemContainerGenerator.ItemFromContainer(tile);
+                ListViewItem listItem = ((FrameworkElement)sender).ParentOfType<ListViewItem>();
+                ImageInfo imageInfo = (ImageInfo)this.listView.ItemContainerGenerator.ItemFromContainer(listItem);
                 this.release.Images.Remove(imageInfo.Image);
                 this.Images.Remove(imageInfo);
 
@@ -381,8 +404,8 @@ namespace MusicDatabase
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            RadTileViewItem tile = ((FrameworkElement)sender).ParentOfType<RadTileViewItem>();
-            ImageInfo imageInfo = (ImageInfo)this.tileView.ItemContainerGenerator.ItemFromContainer(tile);
+            ListViewItem listItem = ((FrameworkElement)sender).ParentOfType<ListViewItem>();
+            ImageInfo imageInfo = (ImageInfo)this.listView.ItemContainerGenerator.ItemFromContainer(listItem);
             Image image = imageInfo.Image;
 
             SaveFileDialog dialog = new SaveFileDialog();

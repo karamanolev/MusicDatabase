@@ -5,12 +5,12 @@ namespace MusicDatabase.Engine.Local
 {
     public class LocalCollectionMerger
     {
-        private CollectionManager collectionManager;
+        private ICollectionManager collectionManager;
         private LocalCollectionMatcherResult matcherResult;
         private bool saveToFiles;
         private int totalProcessed = 0, total;
 
-        public LocalCollectionMerger(CollectionManager collectionManager, LocalCollectionMatcherResult matcherResult, bool saveToFiles)
+        public LocalCollectionMerger(ICollectionManager collectionManager, LocalCollectionMatcherResult matcherResult, bool saveToFiles)
         {
             this.collectionManager = collectionManager;
             this.matcherResult = matcherResult;
@@ -24,29 +24,25 @@ namespace MusicDatabase.Engine.Local
 
         public void Merge()
         {
-            using (var transaction = this.collectionManager.BeginTransaction())
+            this.AddReleases();
+
+            if (this.saveToFiles)
             {
-                this.AddReleases();
-                if (this.saveToFiles)
-                {
-                    this.SaveChangesToFiles();
-                }
-                else
-                {
-                    this.LoadChangesFromFiles();
-                }
-
-                this.DeleteReleases();
-
-                transaction.Commit();
+                this.SaveChangesToFiles();
             }
+            else
+            {
+                this.LoadChangesFromFiles();
+            }
+
+            this.DeleteReleases();
         }
 
         private void DeleteReleases()
         {
             foreach (Release release in matcherResult.DeletedReleases)
             {
-                this.collectionManager.DeleteRelease(release);
+                this.collectionManager.DeleteRelease(release, false);
 
                 ++this.totalProcessed;
                 this.OnProgressChanged();
@@ -65,7 +61,6 @@ namespace MusicDatabase.Engine.Local
                 Release release = item.Item1;
                 LocalAlbum album = item.Item2;
                 release.Genre = album.Genre ?? release.Genre;
-                release.DiscCount = album.DiscCount == 0 ? release.DiscCount : album.DiscCount;
                 if (album.Year != 0 && release.ReleaseDate.Date.Year != album.Year)
                 {
                     release.ReleaseDate = album.Year == 0 ? new ReleaseDate() : new ReleaseDate(album.Year);
@@ -78,7 +73,7 @@ namespace MusicDatabase.Engine.Local
                 release.DateModified = DateTime.Now;
 
                 release.UpdateDynamicProperties();
-                this.collectionManager.SaveOrUpdate(release);
+                this.collectionManager.Save(release);
 
                 ++this.totalProcessed;
                 this.OnProgressChanged();
@@ -105,7 +100,6 @@ namespace MusicDatabase.Engine.Local
                     release.ReleaseDate = new ReleaseDate(album.Year);
                 }
                 release.Genre = album.Genre;
-                release.DiscCount = album.DiscCount;
                 release.Tracklist.AddRange(this.collectionManager.Operations.GenerateTracklistForLocalAlbum(this.collectionManager, album, release));
 
                 release.DateAdded = DateTime.Now;
@@ -113,7 +107,7 @@ namespace MusicDatabase.Engine.Local
                 release.DateAudioModified = DateTime.Now;
 
                 release.UpdateDynamicProperties();
-                this.collectionManager.SaveOrUpdate(release);
+                this.collectionManager.Save(release);
 
                 ++this.totalProcessed;
                 this.OnProgressChanged();

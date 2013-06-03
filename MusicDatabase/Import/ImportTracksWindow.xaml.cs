@@ -14,6 +14,8 @@ using MusicDatabase.Engine.Entities;
 using MusicDatabase.Engine.ImportExport;
 using MusicDatabase.Engine.Tagging;
 using MusicDatabase.WikipediaLink;
+using MongoDB.Bson;
+using MusicDatabase.Engine.Database;
 
 namespace MusicDatabase.Import
 {
@@ -24,7 +26,7 @@ namespace MusicDatabase.Import
     {
         private bool completed;
 
-        public int InsertedReleaseId { get; private set; }
+        public string InsertedReleaseId { get; private set; }
         public ImportReleaseItem Release { get; private set; }
         public Release DatabaseRelease { get; private set; }
 
@@ -148,8 +150,6 @@ namespace MusicDatabase.Import
             };
             discEditor.ItemAdding += new EventHandler<TrackAddingEventArgs>(discEditor_ItemAdding);
 
-            ++this.DatabaseRelease.DiscCount;
-
             this.tabs.Items.Add(new TabItem()
             {
                 Header = "Disc " + this.Release.Discs.Count,
@@ -174,7 +174,6 @@ namespace MusicDatabase.Import
 
                 this.Release.Discs.RemoveAt(this.Release.Discs.Count - 1);
                 this.tabs.Items.RemoveAt(this.tabs.Items.Count - 1);
-                --this.DatabaseRelease.DiscCount;
             }
         }
 
@@ -242,17 +241,18 @@ namespace MusicDatabase.Import
             IEncoderFactory encoderFactory;
             if (this.CollectionManager.Settings.NetworkEncoding)
             {
-                encoderFactory = new RemoteFlacEncoderFactory(this.networkBox.Servers, 8, this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true);
+                encoderFactory = new RemoteFlacEncoderFactory(this.networkBox.Servers, 8, this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true, true);
             }
             else
             {
-                encoderFactory = new NativeFlacEncoderFactory(8, this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true);
+                encoderFactory = new NativeFlacEncoderFactory(8, this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true, true);
             }
 
             IEncoderFactory replayGainFactory = new DspEncoderFactory(this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true, true);
 
+            ReplayGainTask rgTask = new ReplayGainTask(replayGainFactory, this.DatabaseRelease, true, true, true);
+
             List<IParallelTask> tasks = new List<IParallelTask>();
-            Dictionary<Track, FileEncodeTask> trackToTask = new Dictionary<Track, FileEncodeTask>();
             foreach (Track track in this.DatabaseRelease.Tracklist)
             {
                 track.RelativeFilename = FilenameGenerator.PatternToFilename(
@@ -271,10 +271,9 @@ namespace MusicDatabase.Import
                     tag
                     );
                 tasks.Add(task);
-                trackToTask[track] = task;
+                rgTask.AddItem(track, task);
             }
 
-            ReplayGainTask rgTask = new ReplayGainTask(replayGainFactory, tasks.Cast<FileEncodeTask>().ToArray(), true);
             tasks.Add(rgTask);
 
             int concurrency = Math.Max(encoderFactory.ThreadCount, replayGainFactory.ThreadCount);
@@ -282,28 +281,15 @@ namespace MusicDatabase.Import
             EncodingWindow window = new EncodingWindow(controller);
             if (window.ShowDialog(this) == true)
             {
-                using (var transaction = this.CollectionManager.BeginTransaction())
-                {
-                    foreach (KeyValuePair<Track, FileEncodeTask> trackTask in trackToTask)
-                    {
-                        trackTask.Key.DynamicRange = trackTask.Value.DrMeter.GetDynamicRange();
-                        trackTask.Key.ReplayGainTrackGain = trackTask.Value.TrackGain.GetGain();
-                        trackTask.Key.ReplayGainTrackPeak = trackTask.Value.TrackGain.GetPeak();
-                    }
-                    this.DatabaseRelease.ReplayGainAlbumGain = rgTask.AlbumGain.GetGain();
-                    this.DatabaseRelease.ReplayGainAlbumPeak = rgTask.AlbumGain.GetPeak();
+                this.DatabaseRelease.UpdateDynamicProperties();
 
-                    this.DatabaseRelease.UpdateDynamicProperties();
-                    this.CollectionManager.SaveOrUpdate(this.DatabaseRelease);
+                this.CollectionManager.Save(this.DatabaseRelease);
+                this.InsertedReleaseId = this.DatabaseRelease.Id;
 
-                    this.imagesEditor.WriteFiles();
+                this.imagesEditor.WriteFiles();
 
-                    transaction.Commit();
 
-                    this.InsertedReleaseId = this.DatabaseRelease.Id;
-                }
-
-                CollectionManager.OnCollectionChanged();
+                CollectionManagerGlobal.OnCollectionChanged();
 
                 this.completed = true;
                 this.DialogResult = true;
@@ -318,7 +304,7 @@ namespace MusicDatabase.Import
                 ImportTracksDiscEditor discEditor = (ImportTracksDiscEditor)tab.Content;
                 discEditor.CommitChanges(this.CollectionManager);
             }
-            UIHelper.UpdateReleaseThumbnail(this.DatabaseRelease, this.imagesEditor);
+            ThumbnailGenerator.UpdateReleaseThumbnail(this.DatabaseRelease, this.imagesEditor);
             this.DatabaseRelease.DateAdded = DateTime.Now;
             this.DatabaseRelease.DateModified = DateTime.Now;
             this.DatabaseRelease.DateAudioModified = DateTime.Now;
@@ -490,10 +476,10 @@ namespace MusicDatabase.Import
             WaitWindow waitWindow = new WaitWindow("Reading release data...");
             waitWindow.ShowDialog(this, () =>
             {
-                var tempFactory = new CollectionSessionFactory_SQLiteMemory();
-                var tempManager = new CollectionManager(tempFactory);
+                var tempFactory = new MemorySessionFactory();
+                var tempManager = tempFactory.CreateCollectionManager();
 
-                using (XmlReleaseImporter xmlReleaseImporter = new XmlReleaseImporter(file, tempManager, UIHelper.UpdateReleaseThumbnail))
+                using (XmlReleaseImporter xmlReleaseImporter = new XmlReleaseImporter(file, tempManager))
                 {
                     Release release = xmlReleaseImporter.ImportRelease();
 

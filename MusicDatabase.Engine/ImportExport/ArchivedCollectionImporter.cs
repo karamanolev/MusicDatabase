@@ -11,8 +11,8 @@ namespace MusicDatabase.Engine.ImportExport
     {
         private ZipFile zipFile;
 
-        public ArchivedCollectionImporter(string inputPath, CollectionManager collectionManager, Action<Release, ICollectionImageHandler> updateThumbnailAction)
-            : base(collectionManager, updateThumbnailAction)
+        public ArchivedCollectionImporter(string inputPath, ICollectionManager collectionManager)
+            : base(collectionManager)
         {
             this.zipFile = new ZipFile(inputPath);
         }

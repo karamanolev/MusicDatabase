@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using MusicDatabase.DiscogsLink;
 using MusicDatabase.Engine;
 using MusicDatabase.Engine.Entities;
-using MusicDatabase.Engine.Tagging;
 using MusicDatabase.WikipediaLink;
 
 namespace MusicDatabase.Edit
@@ -20,10 +19,10 @@ namespace MusicDatabase.Edit
         private bool completed;
         private Release release;
 
-        public EditReleaseWindow(ICollectionSessionFactory sessionFactory, int releaseId)
+        public EditReleaseWindow(ICollectionSessionFactory sessionFactory, string releaseId)
             : base(sessionFactory)
         {
-            this.release = this.CollectionManager.Releases.Where(r => r.Id == releaseId).FirstOrDefault();
+            this.release = this.CollectionManager.GetReleaseById(releaseId);
 
             InitializeComponent();
 
@@ -80,7 +79,7 @@ namespace MusicDatabase.Edit
                 }
             }
 
-            UIHelper.UpdateReleaseThumbnail(this.release, this.imagesEditor);
+            ThumbnailGenerator.UpdateReleaseThumbnail(release, this.imagesEditor);
 
             this.release.DateModified = DateTime.Now;
         }
@@ -178,28 +177,30 @@ namespace MusicDatabase.Edit
         {
             try
             {
-                MoveTracksAsync();
-
-                int tracksFinished = 0;
-                foreach (Track track in this.release.Tracklist)
+                this.CollectionManager.Operations.MoveTracks(this.release, (filename, ex) =>
                 {
-                    AudioFileTag tag = new AudioFileTag(this.release, track);
-                    string filename = Path.Combine(this.CollectionManager.Settings.MusicDirectory, track.RelativeFilename);
-                    tag.WriteToFile(filename);
+                    var result = Dialogs.YesNoCancel("Moving " + Path.GetFileName(filename) + " failed. Retry / fail / continue.");
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        return false;
+                    }
+                    else if (result == MessageBoxResult.No)
+                    {
+                        throw ex;
+                    }
+                    else if (result == MessageBoxResult.Cancel)
+                    {
+                        return true;
+                    }
+                    return true;
+                });
 
-                    ++tracksFinished;
-                    progress.Report((double)tracksFinished / this.release.Tracklist.Count);
-                }
 
-                using (var transaction = this.CollectionManager.BeginTransaction())
-                {
-                    release.UpdateDynamicProperties();
-                    this.CollectionManager.SaveOrUpdate(release);
+                this.CollectionManager.Operations.WriteTags(this.release, progress);
 
-                    this.imagesEditor.WriteFiles();
-
-                    transaction.Commit();
-                }
+                release.UpdateDynamicProperties();
+                this.CollectionManager.Save(release);
+                this.imagesEditor.WriteFiles();
 
                 this.Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -220,53 +221,8 @@ namespace MusicDatabase.Edit
                     this.detailsEditor.Release = this.release;
                     this.RefreshAllDiscs();
 
-                    CollectionManager.OnCollectionChanged();
+                    CollectionManagerGlobal.OnCollectionChanged();
                 }));
-            }
-        }
-
-        private void MoveTracksAsync()
-        {
-            foreach (Track track in this.release.Tracklist)
-            {
-                string oldFilename = Path.Combine(this.CollectionManager.Settings.MusicDirectory, track.RelativeFilename);
-                string newRelativeName = FilenameGenerator.PatternToFilename(
-                    this.CollectionManager.Settings.FileNamingPattern, this.release, track) + ".flac";
-                string newFilename = Path.Combine(this.CollectionManager.Settings.MusicDirectory, newRelativeName);
-
-                while (true)
-                {
-                    try
-                    {
-                        Directory.CreateDirectory(Path.GetDirectoryName(newFilename));
-                        File.Move(oldFilename, newFilename);
-                        Utility.TryDeleteEmptyFoldersToTheRoot(Path.GetDirectoryName(oldFilename));
-                        break;
-                    }
-                    catch (Exception moveException)
-                    {
-                        var result = Dialogs.YesNoCancel("Moving " + Path.GetFileName(oldFilename) + " failed. Retry / fail / continue.");
-                        if (result == MessageBoxResult.Yes)
-                        {
-                        }
-                        else if (result == MessageBoxResult.No)
-                        {
-                            throw moveException;
-                        }
-                        else if (result == MessageBoxResult.Cancel)
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                track.RelativeFilename = newRelativeName;
-
-                using (var transaction = this.CollectionManager.BeginTransaction())
-                {
-                    this.CollectionManager.SaveOrUpdate(track);
-                    transaction.Commit();
-                }
             }
         }
 

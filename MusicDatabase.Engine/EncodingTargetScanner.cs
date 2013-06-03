@@ -8,10 +8,10 @@ namespace MusicDatabase.Engine
 {
     public class EncodingTargetScanner
     {
-        CollectionManager collectionManager;
+        ICollectionManager collectionManager;
         private EncodingTarget encodingTarget;
 
-        public EncodingTargetScanner(CollectionManager collectionManager, EncodingTarget encodingTarget)
+        public EncodingTargetScanner(ICollectionManager collectionManager, EncodingTarget encodingTarget)
         {
             this.collectionManager = collectionManager;
             this.encodingTarget = encodingTarget;

@@ -1,28 +1,14 @@
 ﻿using System;
-using FluentNHibernate.Mapping;
 using System.Linq;
 
 namespace MusicDatabase.Engine.Entities
 {
     public class ReleaseAdditionalFile
     {
-        public class ReleaseAdditionalFileMap : ClassMap<ReleaseAdditionalFile>
-        {
-            public ReleaseAdditionalFileMap()
-            {
-                Id(x => x.Id);
-                Map(x => x.Type);
-                Map(x => x.OriginalFilename);
-                Map(x => x.Description);
-                Map(x => x.File).LazyLoad();
-            }
-        }
-
-        public virtual int Id { get; protected set; }
-        public virtual ReleaseAdditionalFileType Type { get; set; }
-        public virtual string OriginalFilename { get; set; }
-        public virtual string Description { get; set; }
-        public virtual byte[] File { get; set; }
+        public ReleaseAdditionalFileType Type { get; set; }
+        public string OriginalFilename { get; set; }
+        public string Description { get; set; }
+        public byte[] File { get; set; }
 
         public ReleaseAdditionalFile()
         {

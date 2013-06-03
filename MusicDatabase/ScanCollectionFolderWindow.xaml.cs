@@ -178,7 +178,7 @@ namespace MusicDatabase
 
             this.Dispatcher.Invoke(new Action(() =>
             {
-                CollectionManager.OnCollectionChanged();
+                CollectionManagerGlobal.OnCollectionChanged();
                 EnableCloseButton();
             }));
         }

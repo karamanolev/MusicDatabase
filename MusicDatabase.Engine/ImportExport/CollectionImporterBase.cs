@@ -8,15 +8,15 @@ namespace MusicDatabase.Engine.ImportExport
 {
     public abstract class CollectionImporterBase : IDisposable
     {
-        protected CollectionManager collectionManager;
-        protected byte[] readBuffer;
-        protected Action<Release, ICollectionImageHandler> updateThumbnailAction;
+        private const string InvalidXmlDatabase = "Invalid XML database.";
 
-        public CollectionImporterBase(CollectionManager collectionManager, Action<Release, ICollectionImageHandler> updateThumbnailAction)
+        protected ICollectionManager collectionManager;
+        protected byte[] readBuffer;
+
+        public CollectionImporterBase(ICollectionManager collectionManager)
         {
             this.collectionManager = collectionManager;
             this.readBuffer = new byte[128 * 1024];
-            this.updateThumbnailAction = updateThumbnailAction;
         }
 
         public virtual void Dispose()
@@ -47,92 +47,103 @@ namespace MusicDatabase.Engine.ImportExport
                 Assert.IsTrue(reader.NodeType == XmlNodeType.XmlDeclaration);
 
                 reader.Read();
-                reader.AssertElementStart("release");
+                reader.AssertElementStart(Keys.Release);
 
                 Release release = this.ReadRelease(reader);
-                this.updateThumbnailAction(release, this.collectionManager.ImageHandler);
+                ThumbnailGenerator.UpdateReleaseThumbnail(release, this.collectionManager.ImageHandler);
                 release.UpdateDynamicProperties();
 
                 return release;
             }
         }
 
+        private void ImportInternal()
+        {
+            foreach (Stream stream in this.GetReleaseStreams())
+            {
+                this.collectionManager.Save(this.ImportRelease(stream));
+            }
+        }
+
         public void Import()
         {
-            using (var transaction = this.collectionManager.BeginTransaction())
+            if (this.collectionManager is ITransactionalCollectionManager)
             {
-                foreach (Stream stream in this.GetReleaseStreams())
+                ITransactionalCollectionManager transactional = (ITransactionalCollectionManager)this.collectionManager;
+                using (var transaction = transactional.BeginTransaction())
                 {
-                    this.collectionManager.SaveOrUpdate(this.ImportRelease(stream));
+                    this.ImportInternal();
                 }
-
-                transaction.Commit();
+            }
+            else
+            {
+                this.ImportInternal();
             }
         }
 
         protected Release ReadRelease(XmlReader reader)
         {
-            reader.AssertElementStart("release");
+            reader.AssertElementStart(Keys.Release);
 
             Release release = new Release();
-            release.JoinedAlbumArtists = reader.GetAttributeOrNull("joinedAlbumArtists");
-            release.Title = reader.GetAttributeOrNull("title");
-            release.ReleaseDate = ReleaseDate.Parse(reader.GetAttributeOrNull("releaseDate"));
-            release.OriginalReleaseDate = ReleaseDate.Parse(reader.GetAttributeOrNull("originalReleaseDate"));
-            release.CatalogNumber = reader.GetAttributeOrNull("catalogNumber");
-            release.Label = reader.GetAttributeOrNull("label");
-            release.Country = reader.GetAttributeOrNull("country");
-            release.DiscCount = int.Parse(reader.GetAttribute("discCount"));
-            release.FlagMessage = reader.GetAttributeOrNull("flagMessage");
+            release.JoinedAlbumArtists = reader.GetAttributeOrNull(Keys.JoinedAlbumArtists);
+            release.Title = reader.GetAttributeOrNull(Keys.Title);
+            release.ReleaseDate = ReleaseDate.Parse(reader.GetAttributeOrNull(Keys.ReleaseDate));
+            release.OriginalReleaseDate = ReleaseDate.Parse(reader.GetAttributeOrNull(Keys.OriginalReleaseDate));
+            release.CatalogNumber = reader.GetAttributeOrNull(Keys.CatalogNumber);
+            release.Label = reader.GetAttributeOrNull(Keys.Label);
+            release.Country = reader.GetAttributeOrNull(Keys.Country);
+            release.FlagMessage = reader.GetAttributeOrNull(Keys.FlagMessage);
             release.IsFlagged = release.FlagMessage != null;
-            release.Notes = reader.GetAttributeOrNull("notes");
-            release.WikipediaPageName = reader.GetAttributeOrNull("wikipediaPageName");
-            release.DiscogsReleaseId = reader.GetAttribute("discogsReleaseId") != null ? int.Parse(reader.GetAttribute("discogsReleaseId")) : 0;
-            release.DiscogsMasterId = reader.GetAttribute("discogsMasterId") != null ? int.Parse(reader.GetAttribute("discogsMasterId")) : 0;
-            release.Genre = reader.GetAttributeOrNull("genre");
-            release.Score = reader.GetAttribute("score") != null ? int.Parse(reader.GetAttribute("score")) : 0;
-            release.DynamicRange = reader.GetAttribute("dynamicRange") != null ? int.Parse(reader.GetAttribute("dynamicRange")) : double.NaN;
-            release.ReplayGainAlbumGain = reader.GetAttribute("albumGain") != null ? int.Parse(reader.GetAttribute("albumGain")) : double.NaN;
-            release.ReplayGainAlbumPeak = reader.GetAttribute("albumPeak") != null ? int.Parse(reader.GetAttribute("albumPeak")) : double.NaN;
+            release.Notes = reader.GetAttributeOrNull(Keys.Notes);
+            release.WikipediaPageName = reader.GetAttributeOrNull(Keys.WikipediaPageName);
 
-            if (reader.GetAttributeOrNull("dateAdded") != null)
+            release.DiscogsReleaseId = reader.GetAttributeInt32(Keys.DiscogsReleaseId, 0);
+            release.DiscogsMasterId = reader.GetAttributeInt32(Keys.DiscogsMasterId, 0);
+            release.Genre = reader.GetAttributeOrNull(Keys.Genre);
+            release.Score = reader.GetAttributeInt32(Keys.Score, 0);
+            release.DynamicRange = reader.GetAttributeDouble(Keys.DynamicRange, double.NaN);
+            release.ReplayGainAlbumGain = reader.GetAttributeDouble(Keys.AlbumGain, double.NaN);
+            release.ReplayGainAlbumPeak = reader.GetAttributeDouble(Keys.AlbumPeak, double.NaN);
+
+            if (reader.GetAttributeOrNull(Keys.DateAdded) != null)
             {
-                release.DateAdded = new DateTime(long.Parse(reader.GetAttribute("dateAdded")));
+                release.DateAdded = new DateTime(reader.GetAttributeInt64(Keys.DateAdded, 0));
             }
-            if (reader.GetAttributeOrNull("dateAudioModified") != null)
+            if (reader.GetAttributeOrNull(Keys.DateAudioModified) != null)
             {
-                release.DateAudioModified = new DateTime(long.Parse(reader.GetAttribute("dateAudioModified")));
+                release.DateAudioModified = new DateTime(reader.GetAttributeInt64(Keys.DateAudioModified, 0));
             }
-            if (reader.GetAttributeOrNull("dateModified") != null)
+            if (reader.GetAttributeOrNull(Keys.DateModified) != null)
             {
-                release.DateModified = new DateTime(long.Parse(reader.GetAttribute("dateModified")));
+                release.DateModified = new DateTime(reader.GetAttributeInt64(Keys.DateModified, 0));
             }
 
             if (reader.IsEmptyElement)
             {
-                throw new FormatException("Invalid XML database.");
+                throw new FormatException(InvalidXmlDatabase);
             }
 
             while (reader.Read())
             {
-                if (reader.IsElementEnd("release"))
+                if (reader.IsElementEnd(Keys.Release))
                 {
                     break;
                 }
 
-                if (reader.IsElementStart("artists"))
+                if (reader.IsElementStart(Keys.Artists))
                 {
                     this.ReadArtists(reader, release);
                 }
-                else if (reader.IsElementStart("tracks"))
+                else if (reader.IsElementStart(Keys.Tracks))
                 {
                     this.ReadTracks(reader, release);
                 }
-                else if (reader.IsElementStart("images"))
+                else if (reader.IsElementStart(Keys.Images))
                 {
                     this.ReadImages(reader, release);
                 }
-                else if (reader.IsElementStart("additionalFiles"))
+                else if (reader.IsElementStart(Keys.AdditionalFiles))
                 {
                     this.ReadAdditionalFiles(reader, release);
                 }
@@ -143,46 +154,46 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ReadTracks(XmlReader reader, Release release)
         {
-            reader.AssertElementStart("tracks");
+            reader.AssertElementStart(Keys.Tracks);
 
             if (reader.IsEmptyElement)
             {
-                throw new FormatException("Invalid XML database.");
+                throw new FormatException(InvalidXmlDatabase);
             }
 
             while (reader.Read())
             {
-                if (reader.IsElementEnd("tracks"))
+                if (reader.IsElementEnd(Keys.Tracks))
                 {
                     break;
                 }
 
-                if (reader.IsElementStart("track"))
+                if (reader.IsElementStart(Keys.Track))
                 {
                     Track track = this.ReadTrack(reader);
                     release.Tracklist.Add(track);
                 }
                 else
                 {
-                    throw new FormatException("Invalid XML database.");
+                    throw new FormatException(InvalidXmlDatabase);
                 }
             }
         }
 
         private Track ReadTrack(XmlReader reader)
         {
-            reader.AssertElementStart("track");
+            reader.AssertElementStart(Keys.Track);
 
             Track track = new Track()
             {
-                Disc = int.Parse(reader.GetAttributeOrNull("disc")),
-                Position = int.Parse(reader.GetAttributeOrNull("position")),
-                Title = reader.GetAttributeOrNull("title"),
-                JoinedArtists = reader.GetAttributeOrNull("joinedArtists"),
-                RelativeFilename = reader.GetAttributeOrNull("relativeFilename"),
-                DynamicRange = reader.GetAttributeOrNull("dynamicRange") != null ? double.Parse(reader.GetAttributeOrNull("dynamicRange")) : double.NaN,
-                ReplayGainTrackGain = reader.GetAttributeOrNull("trackGain") != null ? double.Parse(reader.GetAttributeOrNull("trackGain")) : double.NaN,
-                ReplayGainTrackPeak = reader.GetAttributeOrNull("trackPeak") != null ? double.Parse(reader.GetAttributeOrNull("trackPeak")) : double.NaN,
+                Disc = reader.GetAttributeInt32(Keys.Disc, 0),
+                Position = reader.GetAttributeInt32(Keys.Position, 0),
+                Title = reader.GetAttributeOrNull(Keys.Title),
+                JoinedArtists = reader.GetAttributeOrNull(Keys.JoinedArtists),
+                RelativeFilename = reader.GetAttributeOrNull(Keys.RelativeFilename),
+                DynamicRange = reader.GetAttributeDouble(Keys.DynamicRange, double.NaN),
+                ReplayGainTrackGain = reader.GetAttributeDouble(Keys.TrackGain, double.NaN),
+                ReplayGainTrackPeak = reader.GetAttributeDouble(Keys.TrackPeak, double.NaN),
             };
 
             if (reader.IsEmptyElement)
@@ -192,18 +203,18 @@ namespace MusicDatabase.Engine.ImportExport
 
             while (reader.Read())
             {
-                if (reader.IsElementEnd("track"))
+                if (reader.IsElementEnd(Keys.Track))
                 {
                     break;
                 }
 
-                if (reader.IsElementStart("artists"))
+                if (reader.IsElementStart(Keys.Artists))
                 {
                     this.ReadTrackArtists(reader, track);
                 }
                 else
                 {
-                    throw new FormatException("Invalid XML database.");
+                    throw new FormatException(InvalidXmlDatabase);
                 }
             }
 
@@ -212,32 +223,32 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ReadTrackArtists(XmlReader reader, Track track)
         {
-            reader.AssertElementStart("artists");
+            reader.AssertElementStart(Keys.Artists);
 
             if (reader.IsEmptyElement)
             {
-                throw new FormatException("Invalid XML database.");
+                throw new FormatException(InvalidXmlDatabase);
             }
 
             while (reader.Read())
             {
-                if (reader.IsElementEnd("artists"))
+                if (reader.IsElementEnd(Keys.Artists))
                 {
                     break;
                 }
 
-                reader.AssertElementStart("artist");
+                reader.AssertElementStart(Keys.Artist);
                 track.Artists.Add(new TrackArtist()
                 {
-                    Artist = this.collectionManager.GetOrCreateArtist(reader.GetAttributeOrNull("name")),
-                    JoinString = reader.GetAttributeOrNull("join")
+                    Artist = this.collectionManager.GetOrCreateArtist(reader.GetAttributeOrNull(Keys.Name)),
+                    JoinString = reader.GetAttributeOrNull(Keys.JoinString)
                 });
             }
         }
 
         private void ReadAdditionalFiles(XmlReader reader, Release release)
         {
-            reader.AssertElementStart("additionalFiles");
+            reader.AssertElementStart(Keys.AdditionalFiles);
 
             if (reader.IsEmptyElement)
             {
@@ -249,17 +260,17 @@ namespace MusicDatabase.Engine.ImportExport
             {
                 skipRead = false;
 
-                if (reader.IsElementEnd("additionalFiles"))
+                if (reader.IsElementEnd(Keys.AdditionalFiles))
                 {
                     break;
                 }
 
-                reader.AssertElementStart("additionalFile");
+                reader.AssertElementStart(Keys.AdditionalFile);
                 ReleaseAdditionalFile file = new ReleaseAdditionalFile()
                 {
-                    Type = Utility.ParseEnum<ReleaseAdditionalFileType>(reader.GetAttributeOrNull("type")),
-                    Description = reader.GetAttributeOrNull("description"),
-                    OriginalFilename = reader.GetAttributeOrNull("originalFilename")
+                    Type = Utility.ParseEnum<ReleaseAdditionalFileType>(reader.GetAttributeOrNull(Keys.Type)),
+                    Description = reader.GetAttributeOrNull(Keys.Description),
+                    OriginalFilename = reader.GetAttributeOrNull(Keys.OriginalFilename)
                 };
 
                 byte[] resultBuffer = new byte[0];
@@ -281,7 +292,7 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ReadImages(XmlReader reader, Release release)
         {
-            reader.AssertElementStart("images");
+            reader.AssertElementStart(Keys.Images);
 
             if (reader.IsEmptyElement)
             {
@@ -293,24 +304,23 @@ namespace MusicDatabase.Engine.ImportExport
             {
                 skipRead = false;
 
-                if (reader.IsElementEnd("images"))
+                if (reader.IsElementEnd(Keys.Images))
                 {
                     break;
                 }
 
-                reader.AssertElementStart("image");
+                reader.AssertElementStart(Keys.Image);
                 Image image = new Image()
                 {
-                    Type = Utility.ParseEnum<ImageType>(reader.GetAttributeOrNull("type")),
-                    MimeType = reader.GetAttributeOrNull("mimeType"),
-                    Extension = reader.GetAttributeOrNull("extension"),
-                    Description = reader.GetAttributeOrNull("description"),
-                    IsMain = bool.Parse(reader.GetAttributeOrNull("isMain"))
+                    Type = Utility.ParseEnum<ImageType>(reader.GetAttributeOrNull(Keys.Type)),
+                    MimeType = reader.GetAttributeOrNull(Keys.MimeType),
+                    Extension = reader.GetAttributeOrNull(Keys.Extension),
+                    Description = reader.GetAttributeOrNull(Keys.Description),
+                    IsMain = bool.Parse(reader.GetAttributeOrNull(Keys.IsMain))
                 };
                 release.Images.Add(image);
 
                 release.UpdateDynamicProperties();
-                this.collectionManager.SaveOrUpdate(image);
 
                 this.collectionManager.ImageHandler.StoreImageFromXml(image, reader);
 
@@ -320,25 +330,25 @@ namespace MusicDatabase.Engine.ImportExport
 
         private void ReadArtists(XmlReader reader, Release release)
         {
-            reader.AssertElementStart("artists");
+            reader.AssertElementStart(Keys.Artists);
 
             if (reader.IsEmptyElement)
             {
-                throw new FormatException("Invalid XML database.");
+                throw new FormatException(InvalidXmlDatabase);
             }
 
             while (reader.Read())
             {
-                if (reader.IsElementEnd("artists"))
+                if (reader.IsElementEnd(Keys.Artists))
                 {
                     break;
                 }
 
-                reader.AssertElementStart("artist");
+                reader.AssertElementStart(Keys.Artist);
                 release.Artists.Add(new ReleaseArtist()
                 {
-                    Artist = this.collectionManager.GetOrCreateArtist(reader.GetAttributeOrNull("name")),
-                    JoinString = reader.GetAttributeOrNull("join")
+                    Artist = this.collectionManager.GetOrCreateArtist(reader.GetAttributeOrNull(Keys.Name)),
+                    JoinString = reader.GetAttributeOrNull(Keys.JoinString)
                 });
             }
         }

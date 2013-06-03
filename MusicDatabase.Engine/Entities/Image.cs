@@ -1,31 +1,22 @@
-﻿using FluentNHibernate.Mapping;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace MusicDatabase.Engine.Entities
 {
     public class Image
     {
-        public class ImageMap : ClassMap<Image>
-        {
-            public ImageMap()
-            {
-                Id(x => x.Id);
-                Map(x => x.IsMain);
-                Map(x => x.Type);
-                Map(x => x.MimeType);
-                Map(x => x.Extension);
-                Map(x => x.Description);
-            }
-        }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
-        public virtual int Id { get; protected set; }
-        public virtual bool IsMain { get; set; }
-        public virtual ImageType Type { get; set; }
-        public virtual string MimeType { get; set; }
-        public virtual string Extension { get; set; }
-        public virtual string Description { get; set; }
+        public bool IsMain { get; set; }
+        public ImageType Type { get; set; }
+        public string MimeType { get; set; }
+        public string Extension { get; set; }
+        public string Description { get; set; }
 
         public Image()
         {
+            this.Id = ObjectId.GenerateNewId().ToString();
         }
     }
 }

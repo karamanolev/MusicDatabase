@@ -12,7 +12,7 @@ namespace MusicDatabase
     {
         private Release release;
 
-        public ViewReleaseImagesWindow(CollectionManager collectionManager, Release release)
+        public ViewReleaseImagesWindow(ICollectionManager collectionManager, Release release)
         {
             this.release = release;
             this.CollectionManager = collectionManager;

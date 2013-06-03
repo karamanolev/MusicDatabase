@@ -20,19 +20,20 @@ namespace MusicDatabase
             public FontStyle FontStyle { get; set; }
         }
 
+        private Release[] releases;
         private MainCollectionViewOperations operations;
         private DelayedExecution delayedExecution;
         private ICollectionSessionFactory collectionSessionFactory;
-        private CollectionManager collectionManager, refreshCollectionManager;
+        private ICollectionManager collectionManager;
         private Task backgroundTask;
         private ReleaseFilter releaseFilter;
         private IReleaseBrowser currentReleaseBrowser;
 
         private bool cancelSearch = false;
         private bool isLoading = false;
-        private object releaseToSelect;
+        private SelectionInfo releaseToSelect;
 
-        public CollectionManager CollectionManager
+        public ICollectionManager CollectionManager
         {
             get { return this.collectionManager; }
         }
@@ -49,21 +50,13 @@ namespace MusicDatabase
                     this.collectionManager.Dispose();
                     this.collectionManager = null;
                 }
-                if (this.refreshCollectionManager != null)
-                {
-                    this.refreshCollectionManager.Dispose();
-                    this.refreshCollectionManager = null;
-                }
 
                 if (this.collectionSessionFactory != null)
                 {
-                    this.collectionManager = new CollectionManager(this.collectionSessionFactory);
+                    this.collectionManager = this.collectionSessionFactory.CreateCollectionManager();
                     this.releaseDetailsView.CollectionManager = this.collectionManager;
-                    this.collectionStatistics.CollectionManager = this.collectionManager;
                     this.releaseTree.CollectionManager = this.collectionManager;
                     this.releaseList.CollectionManager = this.collectionManager;
-
-                    this.refreshCollectionManager = new CollectionManager(this.collectionSessionFactory);
 
                     this.collectionStatistics.UpdateUI();
                 }
@@ -76,9 +69,12 @@ namespace MusicDatabase
         public MainCollectionView()
         {
             this.operations = new MainCollectionViewOperations(this);
-            this.releaseFilter = new MusicDatabase.ReleaseFilter();
+            this.releaseFilter = new ReleaseFilter();
+            this.releaseToSelect = new SelectionInfo(SelectionInfoType.None);
 
             InitializeComponent();
+
+            this.collectionStatistics.Init(this);
 
             this.ResetFilter();
 
@@ -106,11 +102,6 @@ namespace MusicDatabase
                 this.collectionManager.Dispose();
                 this.collectionManager = null;
             }
-            if (this.refreshCollectionManager != null)
-            {
-                this.refreshCollectionManager.Dispose();
-                this.refreshCollectionManager = null;
-            }
         }
 
         private void ResetFilter()
@@ -133,8 +124,15 @@ namespace MusicDatabase
             this.releaseFilter.DoExtendedSearch = this.checkFilterDoExtendedSearch.IsChecked == true;
         }
 
+        public void SpecialSearch(string name, Func<Release, bool> filter)
+        {
+            this.releaseFilter.FilterFunction = filter;
+            this.textFilter.Text = "{ " + name + " }";
+        }
+
         public void OnCollectionChanged()
         {
+            this.releases = null;
             this.ClearCaches();
             this.ReloadReleases();
             this.collectionStatistics.UpdateUI();
@@ -175,21 +173,24 @@ namespace MusicDatabase
 
                 Release[] filteredReleases = null;
 
-                Task filterTask = new Task(() =>
+                this.backgroundTask = new Task(() =>
                 {
-                    filteredReleases = this.refreshCollectionManager.Releases.ToArray().Where(r =>
+                    if (this.releases == null)
+                    {
+                        this.releases = this.collectionManager.Releases.ToArray();
+                    }
+                    filteredReleases = this.releases.Where(r =>
                     {
                         if (this.cancelSearch) return false;
                         return this.releaseFilter.Match(r);
                     }).ToArray();
-                });
 
-                this.backgroundTask = filterTask.ContinueWith(t =>
-                {
                     if (!this.cancelSearch)
                     {
                         this.Dispatcher.BeginInvokeAction(() =>
                         {
+                            this.collectionStatistics.Releases = this.releases;
+
                             if (filteredReleases != null)
                             {
                                 DisplayReleases(filteredReleases);
@@ -201,7 +202,7 @@ namespace MusicDatabase
                     this.backgroundTask = null;
                 });
 
-                filterTask.Start();
+                this.backgroundTask.Start();
             }
         }
 
@@ -225,9 +226,9 @@ namespace MusicDatabase
             }
         }
 
-        public Release GetLocalRelease(int id)
+        public Release GetLocalRelease(string id)
         {
-            return this.collectionManager.Releases.Where(r => r.Id == id).FirstOrDefault();
+            return this.collectionManager.GetReleaseById((id));
         }
 
         private void DisplayReleases(Release[] releases)
@@ -242,13 +243,16 @@ namespace MusicDatabase
             {
                 string[] albumArtists = this.currentReleaseBrowser.AlbumArtists;
 
-                if (albumArtists == null && releases.Length != 0)
+                if (albumArtists == null)
                 {
-                    this.currentReleaseBrowser.SetSelectedItem(releases[0].Id);
+                    if (releases.Length != 0)
+                    {
+                        this.currentReleaseBrowser.SetSelectedItem(SelectionInfo.Release(releases[0].Id));
+                    }
                 }
                 else if (albumArtists.Length == 1)
                 {
-                    this.currentReleaseBrowser.SetSelectedItem(albumArtists[0]);
+                    this.currentReleaseBrowser.SetSelectedItem(SelectionInfo.Artist(albumArtists[0]));
                 }
             }
         }
@@ -258,15 +262,15 @@ namespace MusicDatabase
             return this.currentReleaseBrowser.GetSelectedItem();
         }
 
-        public void SetSelectedItem(object item)
+        public void SetSelectedItem(SelectionInfo info)
         {
             if (this.isLoading)
             {
-                this.releaseToSelect = item;
+                this.releaseToSelect = info;
             }
             else
             {
-                this.currentReleaseBrowser.SetSelectedItem(item);
+                this.currentReleaseBrowser.SetSelectedItem(info);
             }
         }
 
@@ -284,8 +288,8 @@ namespace MusicDatabase
                 return true;
             }
 
-            object selectedItem = this.currentReleaseBrowser.GetSelectedItem();
-            if (selectedItem == null)
+            SelectionInfo selectedItem = this.currentReleaseBrowser.GetSelectedItem();
+            if (selectedItem.Type == SelectionInfoType.None)
             {
                 this.tracklistView.Releases = null;
 
@@ -296,9 +300,9 @@ namespace MusicDatabase
                 this.releaseCoverFlow.Visibility = Visibility.Collapsed;
                 this.releaseCoverFlow.Releases = null;
             }
-            else if (selectedItem is int)
+            else if (selectedItem.Type == SelectionInfoType.Release)
             {
-                Release release = this.GetLocalRelease((int)selectedItem);
+                Release release = this.GetLocalRelease(selectedItem.ReleaseId);
 
                 this.tracklistView.Releases = new Release[] { release };
 
@@ -309,10 +313,10 @@ namespace MusicDatabase
                 this.releaseCoverFlow.Visibility = Visibility.Collapsed;
                 this.releaseCoverFlow.Releases = null;
             }
-            else if (selectedItem is string)
+            else if (selectedItem.Type == SelectionInfoType.Artist)
             {
-                int[] releaseIds = this.currentReleaseBrowser.GetReleaseIdsByAlbumArtist((string)selectedItem);
-                Release[] releases = releaseIds.Select(r => this.GetLocalRelease(r)).ToArray();
+                var releaseIds = this.currentReleaseBrowser.GetReleaseIdsByAlbumArtist(selectedItem.ArtistName);
+                Release[] releases = releaseIds.Select(r => this.GetLocalRelease(r)).Where(r => r != null).ToArray();
                 this.tracklistView.Releases = releases;
 
                 this.tracklistView.Visibility = Visibility.Visible;
@@ -338,7 +342,7 @@ namespace MusicDatabase
 
         private void releaseCoverFlow_ItemSelected(object sender, EventArgs e)
         {
-            this.SetSelectedItem(this.releaseCoverFlow.Releases[this.releaseCoverFlow.SelectedIndex].Id);
+            this.SetSelectedItem(SelectionInfo.Release(this.releaseCoverFlow.Releases[this.releaseCoverFlow.SelectedIndex].Id));
         }
 
         public void ClearCaches()
@@ -347,10 +351,11 @@ namespace MusicDatabase
             {
                 this.collectionManager.ClearCache();
             }
-            if (this.refreshCollectionManager != null)
-            {
-                this.refreshCollectionManager.ClearCache();
-            }
+        }
+
+        public void ClearSearch()
+        {
+            this.textFilter.Text = "";
         }
 
         #region UI Handlers
@@ -368,9 +373,9 @@ namespace MusicDatabase
 
         private void releaseDetailsView_EditReleaseClicked(object sender, System.EventArgs e)
         {
-            int id = this.releaseDetailsView.Release.Id;
+            string id = this.releaseDetailsView.Release.Id;
             this.operations.EditRelease(id);
-            this.SetSelectedItem(id);
+            this.SetSelectedItem(SelectionInfo.Release(id));
         }
 
         private void releaseDetailsView_DeleteReleaseClicked(object sender, System.EventArgs e)
@@ -407,7 +412,7 @@ namespace MusicDatabase
 
         private void btnClearSearch_Click(object sender, RoutedEventArgs e)
         {
-            this.textFilter.Text = "";
+            ClearSearch();
         }
 
         private void releaseDetailsView_ChecksumClicked(object sender, EventArgs e)
@@ -420,11 +425,11 @@ namespace MusicDatabase
             this.operations.ExploreRelease(this.releaseDetailsView.Release);
         }
 
-        #endregion
-
         private void releaseDetailsView_RemoveReleaseClicked(object sender, EventArgs e)
         {
             this.operations.RemoveRelease(this.releaseDetailsView.Release);
         }
+
+        #endregion
     }
 }

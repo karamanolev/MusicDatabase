@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using CUETools.Codecs;
+using MusicDatabase.Engine;
 
 namespace MusicDatabase.Audio.Network
 {
@@ -26,9 +27,9 @@ namespace MusicDatabase.Audio.Network
 
         private void CheckPCMConfig(AudioPCMConfig pcm)
         {
-            if (pcm.BitsPerSample != 16)
+            if (pcm.BitsPerSample != 16 && pcm.BitsPerSample != 24)
             {
-                throw new ArgumentException("LAME only supports 16 bits/sample.");
+                throw new UnsupportedBitsPerSampleException("LAME only supports 16 bits/sample. 24 bits are supported through conversion.");
             }
         }
     }

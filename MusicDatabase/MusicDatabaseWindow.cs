@@ -7,13 +7,13 @@ namespace MusicDatabase
 {
     public class MusicDatabaseWindow : Window
     {
-        private CollectionManager collectionManager;
+        private ICollectionManager collectionManager;
         private bool shouldDisposeCollectionManager = true;
 
         public ICollectionSessionFactory CollectionSessionFactory { get; private set; }
         public SettingsManager SettingsManager { get; private set; }
 
-        public CollectionManager CollectionManager
+        public ICollectionManager CollectionManager
         {
             get
             {
@@ -23,7 +23,7 @@ namespace MusicDatabase
                     {
                         throw new InvalidOperationException("Window was created without collection session factory, but a manager is requested.");
                     }
-                    this.collectionManager = new CollectionManager(this.CollectionSessionFactory);
+                    this.collectionManager = this.CollectionSessionFactory.CreateCollectionManager();
                 }
                 return this.collectionManager;
             }
@@ -64,7 +64,7 @@ namespace MusicDatabase
                 this.CollectionSessionFactory = collectionSessionFactory;
             }
 
-            CollectionManager.CollectionChanged += new EventHandler(CollectionManager_CollectionChanged);
+            CollectionManagerGlobal.CollectionChanged += new EventHandler(CollectionManager_CollectionChanged);
             SettingsManager.SettingsChanged += new EventHandler(SettingsManager_SettingsChanged);
         }
 
@@ -109,7 +109,7 @@ namespace MusicDatabase
 
             this.SettingsManager.Dispose();
 
-            CollectionManager.CollectionChanged -= this.CollectionManager_CollectionChanged;
+            CollectionManagerGlobal.CollectionChanged -= this.CollectionManager_CollectionChanged;
         }
 
         [Obsolete("Use ShowDialog(Window owner)")]

@@ -2,12 +2,12 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using MusicDatabase.Advanced;
+using MusicDatabase.Edit;
 using MusicDatabase.Engine;
 using MusicDatabase.Engine.Entities;
-using MusicDatabase.Edit;
-using System.Text;
 
 namespace MusicDatabase
 {
@@ -15,7 +15,7 @@ namespace MusicDatabase
     {
         private MainCollectionView mainCollectionView;
 
-        private CollectionManager CollectionManager
+        private ICollectionManager CollectionManager
         {
             get { return this.mainCollectionView.CollectionManager; }
         }
@@ -32,12 +32,12 @@ namespace MusicDatabase
                 if (Dialogs.Confirm("Unflag release?"))
                 {
                     release.IsFlagged = false;
-                    using (var transaction = this.CollectionManager.BeginTransaction())
-                    {
-                        this.CollectionManager.SaveOrUpdate(release);
-                        transaction.Commit();
-                    }
-                    CollectionManager.OnCollectionChanged();
+                    //using (var transaction = this.CollectionManager.BeginTransaction())
+                    //{
+                    this.CollectionManager.Save(release);
+                    //transaction.Commit();
+                    //}
+                    CollectionManagerGlobal.OnCollectionChanged();
                 }
             }
             else
@@ -49,12 +49,14 @@ namespace MusicDatabase
                 {
                     release.IsFlagged = true;
                     release.FlagMessage = flagWindow.FlagMessage;
-                    using (var transaction = this.CollectionManager.BeginTransaction())
-                    {
-                        this.CollectionManager.SaveOrUpdate(release);
-                        transaction.Commit();
-                    }
-                    CollectionManager.OnCollectionChanged();
+
+                    //using (var transaction = this.CollectionManager.BeginTransaction())
+                    //{
+                    this.CollectionManager.Save(release);
+                    //transaction.Commit();
+                    //}
+
+                    CollectionManagerGlobal.OnCollectionChanged();
                 }
             }
         }
@@ -64,16 +66,16 @@ namespace MusicDatabase
             VerificationWindow verify = new VerificationWindow("This will permanently delete all files and images!");
             if (verify.ShowDialog(Window.GetWindow(this.mainCollectionView)) == true)
             {
-                using (var transaction = this.CollectionManager.BeginTransaction())
+                //using (var transaction = this.CollectionManager.BeginTransaction())
+                //{
+                string releaseName = release.JoinedAlbumArtists + " - " + release.Title;
+                if (!this.CollectionManager.DeleteRelease(release, true))
                 {
-                    string releaseName = release.JoinedAlbumArtists + " - " + release.Title;
-                    if (!this.CollectionManager.DeleteRelease(release))
-                    {
-                        Dialogs.Inform("Some files from " + releaseName + " were not deleted successfully. Please check by hand.");
-                    }
-                    transaction.Commit();
+                    Dialogs.Inform("Some files from " + releaseName + " were not deleted successfully. Please check by hand.");
                 }
-                CollectionManager.OnCollectionChanged();
+                //transaction.Commit();
+                //}
+                CollectionManagerGlobal.OnCollectionChanged();
             }
         }
 
@@ -100,7 +102,7 @@ namespace MusicDatabase
             Process.Start(release.GetDirectory(this.CollectionManager));
         }
 
-        public void EditRelease(int id)
+        public void EditRelease(string id)
         {
             EditReleaseWindow editReleaseWindow = new EditReleaseWindow(this.mainCollectionView.CollectionSessionFactory, id);
             editReleaseWindow.ShowDialog(Window.GetWindow(this.mainCollectionView));
@@ -111,20 +113,20 @@ namespace MusicDatabase
             VerificationWindow verify = new VerificationWindow("This will permanently delete all metadata, but audio files will be kept!");
             if (verify.ShowDialog(Window.GetWindow(this.mainCollectionView)) == true)
             {
-                using (var transaction = this.CollectionManager.BeginTransaction())
+                //using (var transaction = this.CollectionManager.BeginTransaction())
+                //{
+                string releaseName = release.JoinedAlbumArtists + " - " + release.Title;
+                try
                 {
-                    string releaseName = release.JoinedAlbumArtists + " - " + release.Title;
-                    try
-                    {
-                        this.CollectionManager.RemoveRelease(release);
-                    }
-                    catch
-                    {
-                        Dialogs.Inform("Some files from " + releaseName + " were not deleted successfully. Please check by hand.");
-                    }
-                    transaction.Commit();
+                    this.CollectionManager.DeleteRelease(release, false);
                 }
-                CollectionManager.OnCollectionChanged();
+                catch
+                {
+                    Dialogs.Inform("Some files from " + releaseName + " were not deleted successfully. Please check by hand.");
+                }
+                //transaction.Commit();
+                //}
+                CollectionManagerGlobal.OnCollectionChanged();
             }
         }
     }

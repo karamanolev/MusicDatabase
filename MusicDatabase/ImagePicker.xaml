@@ -1,0 +1,41 @@
+﻿<Window x:Class="MusicDatabase.ImagePicker"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:local="clr-namespace:MusicDatabase"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Title="ImagePicker" Height="1024" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Margin="6" Text="Title:" Name="textTitle" />
+
+        <ListView Grid.Row="1" Margin="6,0,6,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Name="listView" SelectionMode="Single">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" ItemWidth="454" ItemHeight="482" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid MouseLeftButtonDown="Grid_MouseLeftButtonDown">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Image Grid.Row="0" Margin="5,5,5,0" Source="{Binding Image}" Width="450" Height="450" />
+                        <TextBlock Grid.Row="1" Margin="5" Text="{Binding Description}" HorizontalAlignment="Center" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <local:OKCancelBox Grid.Row="2" Margin="6" OKClicked="OKCancelBox_OKClicked" CancelClicked="OKCancelBox_CancelClicked" />
+        <Button Grid.Row="2" Margin="6" HorizontalAlignment="Left" Content="Skip" Width="100" Click="btnSkip_Click" />
+    </Grid>
+</Window>

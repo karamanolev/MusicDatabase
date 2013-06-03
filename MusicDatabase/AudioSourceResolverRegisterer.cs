@@ -6,7 +6,7 @@ using MusicDatabase.Audio.Flac;
 
 namespace MusicDatabase
 {
-    class AudioSourceResolverRegisterer
+    public class AudioSourceResolverRegisterer
     {
         public static void RegisterResolvers()
         {

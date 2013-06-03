@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:MusicDatabase"
              xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:statistics="clr-namespace:MusicDatabase.Statistics"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="900">
     <Grid Name="layoutRoot">
@@ -78,7 +79,7 @@
             </Grid>
         </GroupBox>
 
-        <telerik:RadBusyIndicator Margin="0,23,2,3" Grid.RowSpan="2" Name="releaseSelectorBusyIndicator" DisplayAfter="0:0:0.05">
+        <telerik:RadBusyIndicator Margin="0,23,2,0" Grid.RowSpan="2" Name="releaseSelectorBusyIndicator" DisplayAfter="0:0:0.05">
             <Grid>
                 <local:ReleaseTree x:Name="releaseTree" IsEnabled="False"
                            SelectedItemChanged="releaseBrowser_SelectedItemChanged" />
@@ -103,6 +104,6 @@
 
         <local:TracklistView Grid.Column="2" Grid.Row="1" x:Name="tracklistView" />
 
-        <local:CollectionStatisticsControl Grid.Column="2" Grid.RowSpan="2" x:Name="collectionStatistics" />
+        <statistics:CollectionStatisticsControl Grid.Column="2" Grid.RowSpan="2" x:Name="collectionStatistics" />
     </Grid>
 </UserControl>

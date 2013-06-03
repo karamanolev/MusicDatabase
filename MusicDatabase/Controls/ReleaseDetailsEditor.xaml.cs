@@ -46,7 +46,7 @@ namespace MusicDatabase
             }
         }
 
-        public void CommitChanges(CollectionManager collectionManager)
+        public void CommitChanges(ICollectionManager collectionManager)
         {
             if (this.Release.Artists.Join() != this.Release.JoinedAlbumArtists)
             {

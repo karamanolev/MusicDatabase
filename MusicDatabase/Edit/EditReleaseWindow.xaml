@@ -6,7 +6,7 @@
         Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="290" />
+            <ColumnDefinition Width="330" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -42,8 +42,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Images">
-                <local:ReleaseImagesEditor Margin="2" x:Name="imagesEditor" ImageBoxWidth="256" ImageBoxHeight="200"
-                                           IsMaximizationEnabled="False" />
+                <local:ReleaseImagesEditor Margin="2" x:Name="imagesEditor" ImageBoxWidth="256" ImageBoxHeight="200" />
             </TabItem>
             <TabItem Header="Additional Files">
                 <local:AdditionalFilesEditor Margin="2" x:Name="additionalFilesEditor" />
@@ -51,7 +50,7 @@
         </TabControl>
 
         <TabControl Grid.Column="1" Name="tabs" Margin="6" />
-        
+
         <local:OKCancelBox Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,6,6" OKClicked="OKCancelBox_OKClicked" />
     </Grid>
 </local:MusicDatabaseWindow>

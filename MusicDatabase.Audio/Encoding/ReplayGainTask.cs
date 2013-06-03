@@ -1,5 +1,7 @@
-﻿using NReplayGain;
+﻿using MusicDatabase.Engine.Entities;
+using NReplayGain;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -7,6 +9,18 @@ namespace MusicDatabase.Audio.Encoding
 {
     public class ReplayGainTask : IParallelTask
     {
+        internal class Item
+        {
+            public Track Track { get; private set; }
+            public FileEncodeTask Task { get; private set; }
+
+            public Item(Track track, FileEncodeTask task)
+            {
+                this.Track = track;
+                this.Task = task;
+            }
+        }
+
         private double progress;
 
         public IEncoderFactory EncoderFactory { get; private set; }
@@ -15,13 +29,13 @@ namespace MusicDatabase.Audio.Encoding
         {
             get
             {
-                if (this.TrackTasks[0].Tag == null)
+                if (this.TrackTasks[0].Task.Tag == null)
                 {
-                    return Path.GetDirectoryName(this.TrackTasks[0].TargetFilename);
+                    return Path.GetDirectoryName(this.TrackTasks[0].Task.TargetFilename);
                 }
                 else
                 {
-                    return this.TrackTasks[0].Tag.Album;
+                    return this.TrackTasks[0].Task.Tag.Album;
                 }
             }
         }
@@ -30,13 +44,13 @@ namespace MusicDatabase.Audio.Encoding
         {
             get
             {
-                if (this.TrackTasks[0].Tag == null)
+                if (this.TrackTasks[0].Task.Tag == null)
                 {
-                    return Path.GetDirectoryName(this.TrackTasks[0].TargetFilename);
+                    return Path.GetDirectoryName(this.TrackTasks[0].Task.TargetFilename) + " ReplayGain";
                 }
                 else
                 {
-                    return this.TrackTasks[0].Tag.AlbumArtists + " - " + this.TrackTasks[0].Tag.Album;
+                    return this.TrackTasks[0].Task.Tag.AlbumArtists + " - " + this.TrackTasks[0].Task.Tag.Album + " ReplayGain";
                 }
             }
         }
@@ -59,15 +73,27 @@ namespace MusicDatabase.Audio.Encoding
             }
         }
 
-        public FileEncodeTask[] TrackTasks { get; private set; }
+        internal List<Item> TrackTasks { get; private set; }
+
+        public bool RecalculateReplayGain { get; private set; }
+        public Release Release { get; private set; }
         public bool WritePeaks { get; private set; }
+        public bool SaveDynamicRange { get; private set; }
         public AlbumGain AlbumGain { get; set; }
 
-        public ReplayGainTask(IEncoderFactory factory, FileEncodeTask[] trackTasks, bool writePeaks)
+        public ReplayGainTask(IEncoderFactory factory, Release release, bool recalculateReplayGain, bool writePeaks, bool saveDynamicRange)
         {
             this.EncoderFactory = factory;
-            this.TrackTasks = trackTasks;
+            this.Release = release;
+            this.TrackTasks = new List<Item>();
+            this.RecalculateReplayGain = recalculateReplayGain;
             this.WritePeaks = writePeaks;
+            this.SaveDynamicRange = saveDynamicRange;
+        }
+
+        public void AddItem(Track track, FileEncodeTask task)
+        {
+            this.TrackTasks.Add(new Item(track, task));
         }
 
         public event EventHandler ProgressChanged;

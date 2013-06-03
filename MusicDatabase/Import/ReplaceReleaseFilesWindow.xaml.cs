@@ -22,10 +22,10 @@ namespace MusicDatabase.Import
         private Release release;
         private ObservableCollection<IImportSourceItem> items;
 
-        public ReplaceReleaseFilesWindow(ICollectionSessionFactory collectionSessionFactory, int releaseId)
+        public ReplaceReleaseFilesWindow(ICollectionSessionFactory collectionSessionFactory, string releaseId)
             : base(collectionSessionFactory)
         {
-            this.release = this.CollectionManager.Releases.Where(r => r.Id == releaseId).First();
+            this.release = this.CollectionManager.GetReleaseById(releaseId);
 
             InitializeComponent();
 
@@ -159,26 +159,24 @@ namespace MusicDatabase.Import
 
         private void OKCancelBox_OKClicked(object sender, EventArgs e)
         {
-            using (var transaction = this.CollectionManager.BeginTransaction())
-            {
-                this.release.DateAudioModified = DateTime.Now;
-                transaction.Commit();
-            }
+            this.release.DateAudioModified = DateTime.Now;
 
             IEncoderFactory encoderFactory;
             if (this.CollectionManager.Settings.NetworkEncoding)
             {
-                encoderFactory = new RemoteFlacEncoderFactory(this.networkBox.Servers, 8, this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true);
+                encoderFactory = new RemoteFlacEncoderFactory(this.networkBox.Servers, 8, this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true, true);
             }
             else
             {
-                encoderFactory = new NativeFlacEncoderFactory(8, this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true);
+                encoderFactory = new NativeFlacEncoderFactory(8, this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true, true);
             }
 
             IEncoderFactory replayGainFactory = new DspEncoderFactory(this.SettingsManager.Settings.ActualLocalConcurrencyLevel, true, true);
 
+
+            ReplayGainTask rgTask = new ReplayGainTask(replayGainFactory, this.release, true, true, true);
+
             List<IParallelTask> tasks = new List<IParallelTask>();
-            Dictionary<Track, FileEncodeTask> trackToTask = new Dictionary<Track, FileEncodeTask>();
             for (int i = 0; i < this.items.Count; ++i)
             {
                 Track track = this.release.Tracklist[i];
@@ -199,10 +197,9 @@ namespace MusicDatabase.Import
                     tag
                     );
                 tasks.Add(task);
-                trackToTask[track] = task;
+                rgTask.AddItem(track, task);
             }
 
-            ReplayGainTask rgTask = new ReplayGainTask(replayGainFactory, tasks.Cast<FileEncodeTask>().ToArray(), true);
             tasks.Add(rgTask);
 
             int concurrency = Math.Max(encoderFactory.ThreadCount, replayGainFactory.ThreadCount);
@@ -210,26 +207,13 @@ namespace MusicDatabase.Import
             EncodingWindow window = new EncodingWindow(controller);
             if (window.ShowDialog(this) == true)
             {
-                using (var transaction = this.CollectionManager.BeginTransaction())
-                {
-                    foreach (KeyValuePair<Track, FileEncodeTask> trackTask in trackToTask)
-                    {
-                        trackTask.Key.DynamicRange = trackTask.Value.DrMeter.GetDynamicRange();
-                        trackTask.Key.ReplayGainTrackGain = trackTask.Value.TrackGain.GetGain();
-                        trackTask.Key.ReplayGainTrackPeak = trackTask.Value.TrackGain.GetPeak();
-                    }
-                    this.release.ReplayGainAlbumGain = rgTask.AlbumGain.GetGain();
-                    this.release.ReplayGainAlbumPeak = rgTask.AlbumGain.GetPeak();
-
-                    this.release.UpdateDynamicProperties();
-
-                    transaction.Commit();
-                }
+                this.release.UpdateDynamicProperties();
+                this.CollectionManager.Save(this.release);
 
                 this.Close();
             }
 
-            CollectionManager.OnCollectionChanged();
+            CollectionManagerGlobal.OnCollectionChanged();
         }
     }
 }

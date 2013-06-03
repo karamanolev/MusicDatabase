@@ -42,7 +42,7 @@ namespace MusicDatabase
             }
         }
 
-        public CollectionManager CollectionManager { get; set; }
+        public ICollectionManager CollectionManager { get; set; }
 
         public ReleaseDetailsView()
         {
